@@ -10,6 +10,7 @@ release.
 Public repo:
 
 - [raven-ai-esh/mira](https://github.com/raven-ai-esh/mira)
+- [public-launch-v1 release](https://github.com/raven-ai-esh/mira/releases/tag/public-launch-v1)
 
 ## Phase 1. Public Repo Creation
 
@@ -50,7 +51,7 @@ Public repo:
 
 ## Phase 5. Post-Launch Hygiene
 
-- [ ] Open an issue/discussion channel for early adopters.
+- [x] Open an issue/discussion channel for early adopters.
 - [ ] Capture first external questions and blockers.
 - [ ] Start tracking which links and artifacts get reused externally.
 - [ ] Feed external confusion back into docs and onboarding pack.

@@ -66,6 +66,7 @@ Manifest:
 The public repo is now live at:
 
 - [raven-ai-esh/mira](https://github.com/raven-ai-esh/mira)
+- [public-launch-v1 release](https://github.com/raven-ai-esh/mira/releases/tag/public-launch-v1)
 
 What is still pending is the broader announcement wave and post-launch
 community loop:
