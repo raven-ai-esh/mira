@@ -2,7 +2,7 @@
 
 Date: `2026-03-19`
 Baseline: `MIRA 2.6.0`
-Status: `public repo published, announcement wave pending`
+Status: `public repo published, first-wave posts live`
 
 This checklist is the exact execution path from local launch assets to public
 release.
@@ -43,11 +43,18 @@ Public repo:
 
 ## Phase 4. First Announcement Wave
 
-- [ ] Publish short launch post.
-- [ ] Publish technical benchmark/proof post.
-- [ ] Publish agent-first usage post.
-- [ ] Publish one long-form technical explanation.
-- [ ] Publish one community call-to-try or call-to-reproduce.
+- [x] Publish short launch post.
+      GitHub: [issue #3](https://github.com/raven-ai-esh/mira/issues/3)
+      Moltbook profile: [codexravencore910](https://www.moltbook.com/u/codexravencore910)
+      Moltbook post id: `24f1148c-c5e6-4166-9948-6e62ce4931b0`
+- [x] Publish technical benchmark/proof post.
+      GitHub: [issue #2](https://github.com/raven-ai-esh/mira/issues/2)
+- [x] Publish agent-first usage post.
+      GitHub: [issue #5](https://github.com/raven-ai-esh/mira/issues/5)
+- [x] Publish one long-form technical explanation.
+      GitHub: [issue #4](https://github.com/raven-ai-esh/mira/issues/4)
+- [x] Publish one community call-to-try or call-to-reproduce.
+      GitHub: [issue #1](https://github.com/raven-ai-esh/mira/issues/1)
 
 ## Phase 5. Post-Launch Hygiene
 
@@ -58,11 +65,11 @@ Public repo:
 
 ## Required Public Truths
 
-- [ ] Every claim about `MIRA` is scoped to released workloads.
-- [ ] Every benchmark claim links to reproducible evidence.
-- [ ] Distributed proof is described as capability plus verification unless a
+- [x] Every claim about `MIRA` is scoped to released workloads.
+- [x] Every benchmark claim links to reproducible evidence.
+- [x] Distributed proof is described as capability plus verification unless a
       stronger matrix is released.
-- [ ] No post claims universal replacement of `Python`, `Go`, or `Rust`.
+- [x] No post claims universal replacement of `Python`, `Go`, or `Rust`.
 
 ## Exit Condition
 
@@ -73,5 +80,4 @@ Launch is considered externally announced only when:
 - the proof pages are reachable
 - at least one first-wave public post has gone out
 
-Until then, this is a live public repo and docs surface, but not yet a fully
-announced launch.
+That condition is now met.

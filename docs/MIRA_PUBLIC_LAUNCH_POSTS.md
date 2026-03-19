@@ -1,9 +1,25 @@
 # MIRA Public Launch Posts
 
 Date: `2026-03-19`
-Status: `drafts ready, not yet posted`
+Status: `drafts prepared and first-wave external posts published`
 
 These drafts are intentionally narrow and evidence-backed.
+
+Published first-wave anchors:
+
+- launch announcement:
+  [GitHub issue #3](https://github.com/raven-ai-esh/mira/issues/3)
+- benchmark/proof thread:
+  [GitHub issue #2](https://github.com/raven-ai-esh/mira/issues/2)
+- agent-first usage thread:
+  [GitHub issue #5](https://github.com/raven-ai-esh/mira/issues/5)
+- long-form technical explanation:
+  [GitHub issue #4](https://github.com/raven-ai-esh/mira/issues/4)
+- community call-to-reproduce:
+  [GitHub issue #1](https://github.com/raven-ai-esh/mira/issues/1)
+- Moltbook launch post:
+  profile [codexravencore910](https://www.moltbook.com/u/codexravencore910),
+  post id `24f1148c-c5e6-4166-9948-6e62ce4931b0`
 
 ## Short Launch Post
 
@@ -17,9 +33,9 @@ What matters:
 
 Start here:
 
-- quickstart: [MIRA_PUBLIC_QUICKSTART.md](docs/MIRA_PUBLIC_QUICKSTART.md)
-- docs index: [MIRA_PUBLIC_DOCS_INDEX.md](docs/MIRA_PUBLIC_DOCS_INDEX.md)
-- benchmark evidence: [MIRA_PUBLIC_BENCHMARK_EVIDENCE.md](docs/MIRA_PUBLIC_BENCHMARK_EVIDENCE.md)
+- quickstart: [MIRA_PUBLIC_QUICKSTART.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_QUICKSTART.md)
+- docs index: [MIRA_PUBLIC_DOCS_INDEX.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_DOCS_INDEX.md)
+- benchmark evidence: [MIRA_PUBLIC_BENCHMARK_EVIDENCE.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_BENCHMARK_EVIDENCE.md)
 
 Public claim is narrow on purpose: `MIRA` is promoted for released advanced
 backend workloads, not presented as a universal replacement for every language.
@@ -39,8 +55,8 @@ generation + verification, this is the point of `MIRA`.
 
 Start with:
 
-- [MIRA_PUBLIC_AGENT_GENERATION_GUIDE.md](docs/MIRA_PUBLIC_AGENT_GENERATION_GUIDE.md)
-- [MIRA_AGENT_PROMPT_KIT.md](docs/MIRA_AGENT_PROMPT_KIT.md)
+- [MIRA_PUBLIC_AGENT_GENERATION_GUIDE.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_AGENT_GENERATION_GUIDE.md)
+- [MIRA_AGENT_PROMPT_KIT.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_AGENT_PROMPT_KIT.md)
 
 ## Benchmark Post
 
@@ -53,10 +69,10 @@ Start with:
 
 Evidence:
 
-- matrix: [MIRA_PUBLIC_BENCHMARK_MATRIX.md](docs/MIRA_PUBLIC_BENCHMARK_MATRIX.md)
-- diagnostics: [MIRA_PUBLIC_BENCHMARK_DIAGNOSTICS.md](docs/MIRA_PUBLIC_BENCHMARK_DIAGNOSTICS.md)
-- `Go` comparison: [MIRA_PUBLIC_BENCHMARK_COMPARISON_GO.md](docs/MIRA_PUBLIC_BENCHMARK_COMPARISON_GO.md)
-- `Rust` comparison: [MIRA_PUBLIC_BENCHMARK_COMPARISON_RUST.md](docs/MIRA_PUBLIC_BENCHMARK_COMPARISON_RUST.md)
+- matrix: [MIRA_PUBLIC_BENCHMARK_MATRIX.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_BENCHMARK_MATRIX.md)
+- diagnostics: [MIRA_PUBLIC_BENCHMARK_DIAGNOSTICS.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_BENCHMARK_DIAGNOSTICS.md)
+- `Go` comparison: [MIRA_PUBLIC_BENCHMARK_COMPARISON_GO.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_BENCHMARK_COMPARISON_GO.md)
+- `Rust` comparison: [MIRA_PUBLIC_BENCHMARK_COMPARISON_RUST.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_BENCHMARK_COMPARISON_RUST.md)
 
 ## Long-Form Technical Post
 

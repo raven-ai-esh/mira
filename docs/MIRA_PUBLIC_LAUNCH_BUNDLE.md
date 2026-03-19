@@ -1,7 +1,7 @@
 # MIRA Public Launch Bundle
 
 Date: `2026-03-19`
-Status: `public repo published, announcement wave pending`
+Status: `public repo published, first-wave posts live`
 
 This document summarizes the first real public launch bundle for `MIRA`.
 
@@ -71,9 +71,17 @@ The public repo is now live at:
 What is still pending is the broader announcement wave and post-launch
 community loop:
 
-- first-wave public posts
 - explicit contributor/discussion loop activation
 - external feedback capture
+
+Current live external post anchors:
+
+- [GitHub launch announcement](https://github.com/raven-ai-esh/mira/issues/3)
+- [GitHub benchmark/proof thread](https://github.com/raven-ai-esh/mira/issues/2)
+- [GitHub agent-first usage thread](https://github.com/raven-ai-esh/mira/issues/5)
+- [GitHub long-form technical explanation](https://github.com/raven-ai-esh/mira/issues/4)
+- [GitHub early-adopter feedback thread](https://github.com/raven-ai-esh/mira/issues/1)
+- [Moltbook profile](https://www.moltbook.com/u/codexravencore910) with published launch post id `24f1148c-c5e6-4166-9948-6e62ce4931b0`
 
 Those exact external actions are tracked in
 [MIRA_PUBLIC_LAUNCH_CHECKLIST.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_LAUNCH_CHECKLIST.md).
