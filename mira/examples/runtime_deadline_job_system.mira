@@ -1,0 +1,87 @@
+module runtime.deadline.job.system@1
+target native
+
+func timed_job
+arg steps:u32
+ret u32
+eff spawn clock
+cap clock("monotonic")
+spec kind=runtime constraints=[deadline,cancel]
+block b0
+  v0:b1 = task_sleep_ms 20u32
+  v1:b1 = rt_cancelled
+  branch v1 b1(steps) b2(steps)
+
+block b1(steps:u32)
+  return 900u32
+
+block b2(steps:u32)
+  return steps
+end
+
+func run_deadline_job_system
+ret u32
+eff spawn clock
+cap clock("monotonic")
+spec kind=runtime constraints=[deadline,retry,cancel_tree,background_jobs]
+block b0
+  v0:u64 = rt_open 1u32
+  v1:u64 = deadline_open_ms 5u32
+  v2:u64 = retry_open 2u32 3u32
+  v3:u64 = cancel_scope_open
+  v4:u64 = cancel_scope_child v3
+  v5:u64 = rt_try_spawn_u32 v0 timed_job 10u32
+  v6:b1 = cancel_scope_bind_task v4 v5
+  v7:b1 = task_sleep_ms 6u32
+  v8:b1 = deadline_expired v1
+  branch v8 b1(v0, v1, v2, v3, v4, v5) b5(v0, v1, v2, v3, v4, v5)
+
+block b1(rt:u64, deadline:u64, retry:u64, parent:u64, child:u64, task:u64)
+  v9:b1 = cancel_scope_cancel parent
+  v10:b1 = cancel_scope_cancelled child
+  v11:b1 = cancel_scope_cancel child
+  branch v10 b2(rt, deadline, retry, parent, child, task) b5(rt, deadline, retry, parent, child, task)
+
+block b2(rt:u64, deadline:u64, retry:u64, parent:u64, child:u64, task:u64)
+  v12:u32 = rt_join_u32 task
+  v13:b1 = rt_task_close task
+  v14:b1 = retry_record_failure retry
+  v15:u32 = retry_next_delay_ms retry
+  v16:b1 = retry_record_failure retry
+  v17:b1 = retry_exhausted retry
+  branch v17 b3(rt, deadline, retry, parent, child, v12, v15) b4(rt, deadline, retry, parent, child)
+
+block b3(rt:u64, deadline:u64, retry:u64, parent:u64, child:u64, result:u32, delay:u32)
+  v18:b1 = cancel_scope_close child
+  v19:b1 = cancel_scope_close parent
+  v20:b1 = retry_close retry
+  v21:b1 = deadline_close deadline
+  v22:b1 = rt_shutdown rt 50u32
+  v23:b1 = rt_close rt
+  v24:u32 = add result delay
+  v25:u32 = add v24 2u32
+  return v25
+
+block b4(rt:u64, deadline:u64, retry:u64, parent:u64, child:u64)
+  v26:b1 = cancel_scope_close child
+  v27:b1 = cancel_scope_close parent
+  v28:b1 = retry_close retry
+  v29:b1 = deadline_close deadline
+  v30:b1 = rt_shutdown rt 50u32
+  v31:b1 = rt_close rt
+  return 0u32
+
+block b5(rt:u64, deadline:u64, retry:u64, parent:u64, child:u64, task:u64)
+  v32:b1 = rt_cancel task
+  v33:b1 = rt_task_close task
+  v34:b1 = cancel_scope_close child
+  v35:b1 = cancel_scope_close parent
+  v36:b1 = retry_close retry
+  v37:b1 = deadline_close deadline
+  v38:b1 = rt_shutdown rt 50u32
+  v39:b1 = rt_close rt
+  return 0u32
+
+test t0
+  out 905u32
+end

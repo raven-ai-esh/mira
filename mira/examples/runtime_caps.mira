@@ -1,0 +1,30 @@
+module runtime.caps@1
+target native
+
+func monotonic_order
+ret b1
+eff clock
+cap clock("monotonic")
+spec kind=runtime constraints=[clock,monotonic]
+block b0
+  v0:u64 = clock_now_ns
+  v1:u64 = clock_now_ns
+  v2:b1 = le v0 v1
+  return v2
+test t0
+  out true
+end
+
+func seeded_rand_mix
+ret u32
+eff rand
+cap rand("seed=7u32")
+spec kind=runtime constraints=[rand,deterministic_seed]
+block b0
+  v0:u32 = rand_u32
+  v1:u32 = rand_u32
+  v2:u32 = bxor v0 v1
+  return v2
+test t0
+  out 471167712u32
+end

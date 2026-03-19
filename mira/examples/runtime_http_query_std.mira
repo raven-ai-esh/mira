@@ -1,0 +1,42 @@
+module runtime.http.query.std@1
+target native
+
+func parse_query_payload
+ret u8
+eff alloc
+spec kind=http constraints=[query,stdlib,parse]
+block b0
+  v0:own[buf[u8]] = buf_lit GET\x20/items?limit=41&debug=true\x20HTTP/1.1\r\nHost:\x20localhost\r\n\r\n
+  v1:view[buf[u8]] = view v0
+  v2:own[buf[u8]] = http_query_param v1 limit
+  v3:view[buf[u8]] = view v2
+  v4:u32 = buf_parse_u32 v3
+  v5:b1 = eq v4 41u32
+  branch v5 b1(v0, v2, v1) b4(v0, v2)
+
+block b1(req:own[buf[u8]], limit_buf:own[buf[u8]], req_view:view[buf[u8]])
+  v6:own[buf[u8]] = http_query_param req_view debug
+  v7:view[buf[u8]] = view v6
+  v8:b1 = buf_parse_bool v7
+  branch v8 b2(req, limit_buf, v6) b3(req, limit_buf, v6)
+
+block b2(req:own[buf[u8]], limit_buf:own[buf[u8]], debug_buf:own[buf[u8]])
+  v9:b1 = drop debug_buf
+  v10:b1 = drop limit_buf
+  v11:b1 = drop req
+  return 1u8
+
+block b3(req:own[buf[u8]], limit_buf:own[buf[u8]], debug_buf:own[buf[u8]])
+  v12:b1 = drop debug_buf
+  v13:b1 = drop limit_buf
+  v14:b1 = drop req
+  return 0u8
+
+block b4(req:own[buf[u8]], limit_buf:own[buf[u8]])
+  v15:b1 = drop limit_buf
+  v16:b1 = drop req
+  return 0u8
+
+test t0
+  out 1u8
+end

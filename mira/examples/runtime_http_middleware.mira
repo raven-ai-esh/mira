@@ -1,0 +1,41 @@
+module runtime.http.middleware@1
+target native
+
+func authorize_request
+ret u8
+eff net alloc
+cap net("127.0.0.1:18080")
+spec kind=http constraints=[http,middleware,headers,bytes]
+block b0
+  v0:own[buf[u8]] = buf_lit GET\x20/secure\x20HTTP/1.1\r\nAuthorization:\x20token-42\r\n\r\n
+  v1:view[buf[u8]] = view v0
+  v2:b1 = http_method_eq v1 GET
+  branch v2 b1(v0, v1) b4(v0)
+
+block b1(req:own[buf[u8]], req_view:view[buf[u8]])
+  v3:b1 = http_path_eq req_view /secure
+  branch v3 b2(req, req_view) b4(req)
+
+block b2(req:own[buf[u8]], req_view:view[buf[u8]])
+  v4:own[buf[u8]] = http_header req_view Authorization
+  v5:view[buf[u8]] = view v4
+  v6:b1 = buf_eq_lit v5 token-42
+  branch v6 b3(req, v4) b5(req, v4)
+
+block b3(req:own[buf[u8]], auth:own[buf[u8]])
+  v7:b1 = drop auth
+  v8:b1 = drop req
+  return 1u8
+
+block b4(req:own[buf[u8]])
+  v9:b1 = drop req
+  return 0u8
+
+block b5(req:own[buf[u8]], auth:own[buf[u8]])
+  v10:b1 = drop auth
+  v11:b1 = drop req
+  return 0u8
+
+test t0
+  out 1u8
+end

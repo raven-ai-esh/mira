@@ -1,0 +1,92 @@
+module runtime.shard.messaging.edge@1
+target native
+
+func shard_edge_route
+ret u8
+eff alloc queue service
+cap queue("/tmp/mira_2_4_edge.place")
+cap service("shard-edge")
+spec kind=message constraints=[distributed,shard,placement,lease]
+block b0
+  v0:u64 = service_open
+  v1:u64 = placement_open /tmp/mira_2_4_edge.place
+  v2:u64 = lease_open /tmp/mira_2_4_edge.lease
+  v3:u64 = msg_log_open
+  v4:b1 = lease_release v2 7u32
+  v5:own[buf[u8]] = buf_lit room-alpha
+  v6:u32 = shard_route_u32 v5 4u32
+  v7:b1 = placement_assign v1 v6 7u32
+  branch v7 b1(v0, v1, v2, v3, v5, v6) b9(v0, v1, v2, v3, v5)
+
+block b1(service:u64, place:u64, lease:u64, log:u64, payload:own[buf[u8]], shard:u32)
+  v8:u32 = placement_lookup place shard
+  v9:b1 = eq v8 7u32
+  branch v9 b2(service, place, lease, log, payload) b9(service, place, lease, log, payload)
+
+block b2(service:u64, place:u64, lease:u64, log:u64, payload:own[buf[u8]])
+  v10:b1 = lease_acquire lease 7u32
+  branch v10 b3(service, place, lease, log, payload) b9(service, place, lease, log, payload)
+
+block b3(service:u64, place:u64, lease:u64, log:u64, payload:own[buf[u8]])
+  v11:u32 = msg_send log room_alpha edge payload
+  v12:b1 = eq v11 1u32
+  branch v12 b4(service, place, lease, log, payload) b9(service, place, lease, log, payload)
+
+block b4(service:u64, place:u64, lease:u64, log:u64, payload:own[buf[u8]])
+  v13:u32 = msg_recv_seq log edge
+  v14:b1 = eq v13 1u32
+  branch v14 b5(service, place, lease, log, payload) b9(service, place, lease, log, payload)
+
+block b5(service:u64, place:u64, lease:u64, log:u64, payload:own[buf[u8]])
+  v15:own[buf[u8]] = msg_recv_next log edge
+  v16:view[buf[u8]] = view v15
+  v17:b1 = buf_eq_lit v16 room-alpha
+  branch v17 b6(service, place, lease, log, payload, v15) b10(service, place, lease, log, payload, v15)
+
+block b6(service:u64, place:u64, lease:u64, log:u64, payload:own[buf[u8]], recv:own[buf[u8]])
+  v18:u32 = msg_delivery_total log edge
+  v19:b1 = eq v18 1u32
+  branch v19 b7(service, place, lease, log, payload, recv) b10(service, place, lease, log, payload, recv)
+
+block b7(service:u64, place:u64, lease:u64, log:u64, payload:own[buf[u8]], recv:own[buf[u8]])
+  v20:b1 = service_metric_count_dim service routed shard 1u32
+  branch v20 b8(service, place, lease, log, payload, recv) b10(service, place, lease, log, payload, recv)
+
+block b8(service:u64, place:u64, lease:u64, log:u64, payload:own[buf[u8]], recv:own[buf[u8]])
+  v21:u32 = service_metric_total service routed
+  v22:b1 = eq v21 1u32
+  branch v22 b11(service, place, lease, log, payload, recv) b10(service, place, lease, log, payload, recv)
+
+block b9(service:u64, place:u64, lease:u64, log:u64, payload:own[buf[u8]])
+  v23:b1 = msg_log_close log
+  v24:b1 = lease_close lease
+  v25:b1 = placement_close place
+  v26:b1 = service_close service
+  v27:b1 = drop payload
+  return 0u8
+
+block b10(service:u64, place:u64, lease:u64, log:u64, payload:own[buf[u8]], recv:own[buf[u8]])
+  v28:b1 = msg_log_close log
+  v29:b1 = lease_close lease
+  v30:b1 = placement_close place
+  v31:b1 = service_close service
+  v32:b1 = drop recv
+  v33:b1 = drop payload
+  return 0u8
+
+block b11(service:u64, place:u64, lease:u64, log:u64, payload:own[buf[u8]], recv:own[buf[u8]])
+  v34:b1 = lease_release lease 7u32
+  branch v34 b12(service, place, lease, log, payload, recv) b10(service, place, lease, log, payload, recv)
+
+block b12(service:u64, place:u64, lease:u64, log:u64, payload:own[buf[u8]], recv:own[buf[u8]])
+  v35:b1 = msg_log_close log
+  v36:b1 = lease_close lease
+  v37:b1 = placement_close place
+  v38:b1 = service_close service
+  v39:b1 = drop recv
+  v40:b1 = drop payload
+  return 1u8
+
+test t0
+  out 1u8
+end

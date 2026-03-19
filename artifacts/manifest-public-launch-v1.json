@@ -1,0 +1,32 @@
+{
+  "bundle": "MIRA public launch package v1",
+  "date": "2026-03-19",
+  "publication_status": "prepared_locally_not_yet_published",
+  "artifacts": {
+    "launch_bundle": "/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_LAUNCH_BUNDLE.md",
+    "repo_readme": "/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_REPO_README.md",
+    "docs_index": "/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_DOCS_INDEX.md",
+    "launch_checklist": "/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_LAUNCH_CHECKLIST.md",
+    "publishing_guide": "/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_PUBLISHING_GUIDE.md",
+    "launch_posts": "/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_LAUNCH_POSTS.md",
+    "export_builder": "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/tools/build_public_repo_export.py"
+  },
+  "evidence": {
+    "positioning": "/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_POSITIONING.md",
+    "quickstart": "/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_QUICKSTART.md",
+    "benchmark_evidence": "/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_BENCHMARK_EVIDENCE.md",
+    "benchmark_matrix": "/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_BENCHMARK_MATRIX.md",
+    "benchmark_diagnostics": "/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_BENCHMARK_DIAGNOSTICS.md",
+    "proof_messaging": "/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_PROOF_PACK_MESSAGING.md",
+    "proof_analytics": "/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_PROOF_PACK_ANALYTICS.md",
+    "proof_distributed": "/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_PROOF_PACK_DISTRIBUTED.md",
+    "agent_generation_guide": "/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_AGENT_GENERATION_GUIDE.md"
+  },
+  "must_link": [
+    "/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_RELEASE_2.6.0.md",
+    "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/advanced-backend-matrix-2.6.0.json",
+    "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/advanced-backend-matrix-2.6.0-diagnostics.json",
+    "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/advanced-backend-release-bundle-2.6.0.json",
+    "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/distributed-benchmark-2.4.0.json"
+  ]
+}

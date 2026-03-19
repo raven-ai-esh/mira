@@ -1,0 +1,38 @@
+module borrow.aggregate.views@1
+target native
+
+type pair = struct[left:i32,right:i32]
+
+func borrow_named_passthrough
+arg payload:own[pair]
+ret own[pair]
+eff pure
+block b0
+  v0:view[pair] = view payload
+  v1:i32 = field v0 left
+  v2:b1 = eq v1 7i32
+  branch v2 b1(payload) b2(payload)
+
+block b1(out:own[pair])
+  return out
+
+block b2(out:own[pair])
+  return out
+end
+
+func borrow_vec_passthrough
+arg items:own[vec[2,i32]]
+ret own[vec[2,i32]]
+eff pure
+block b0
+  v0:view[vec[2,i32]] = view items
+  v1:i32 = load v0 0u32
+  v2:b1 = eq v1 1i32
+  branch v2 b1(items) b2(items)
+
+block b1(out:own[vec[2,i32]])
+  return out
+
+block b2(out:own[vec[2,i32]])
+  return out
+end

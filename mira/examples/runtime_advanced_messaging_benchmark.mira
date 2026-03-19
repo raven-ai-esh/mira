@@ -1,0 +1,110 @@
+module runtime.advanced.messaging.benchmark@1
+target native
+
+func messaging_transport_bench
+ret u32
+eff service net alloc
+cap service("advanced-messaging-transport")
+cap net("127.0.0.1:39582")
+spec kind=service constraints=[messaging,transport,portable_native]
+block b0
+  v0:u64 = service_open
+  v1:own[buf[u8]] = buf_lit POST\x20/session\x20HTTP/1.1\r\nHost:\x20localhost\r\nContent-Type:\x20application/json\r\n\r\n{\x22fanout\x22:42}
+  v2:b1 = service_route v1 POST /session
+  v3:own[buf[u8]] = http_body v1
+  v4:u32 = json_get_u32 v3 fanout
+  v5:b1 = eq v4 42u32
+  branch v2 b1(v0, v1, v3, v4, v5) b4(v0, v1, v3)
+
+block b1(svc:u64, req:own[buf[u8]], body:own[buf[u8]], fanout:u32, body_ok:b1)
+  branch body_ok b3(svc, req, body, fanout) b4(svc, req, body)
+
+block b3(svc:u64, req:own[buf[u8]], body:own[buf[u8]], fanout:u32)
+  v8:u32 = service_health_status svc
+  v9:u32 = add fanout v8
+  v10:b1 = service_close svc
+  v11:b1 = drop body
+  v12:b1 = drop req
+  return v9
+
+block b4(svc:u64, req:own[buf[u8]], body:own[buf[u8]])
+  v13:b1 = service_close svc
+  v14:b1 = drop body
+  v15:b1 = drop req
+  return 0u32
+
+test t0
+  out 242u32
+end
+
+func messaging_fanout_bench
+ret u32
+eff service net alloc
+cap service("advanced-messaging-fanout")
+cap net("127.0.0.1:39582")
+spec kind=service constraints=[messaging,fanout,portable_native]
+block b0
+  v0:u64 = service_open
+  v1:own[buf[u8]] = buf_lit POST\x20/fanout\x20HTTP/1.1\r\nHost:\x20localhost\r\nContent-Type:\x20application/json\r\n\r\n{\x22count\x22:2}
+  v2:b1 = service_route v1 POST /fanout
+  v3:own[buf[u8]] = http_body v1
+  v4:u32 = json_get_u32 v3 count
+  v5:b1 = eq v4 2u32
+  branch v2 b1(v0, v1, v3, v4, v5) b4(v0, v1, v3)
+
+block b1(svc:u64, req:own[buf[u8]], body:own[buf[u8]], count:u32, count_ok:b1)
+  branch count_ok b2(svc, req, body, count) b4(svc, req, body)
+
+block b2(svc:u64, req:own[buf[u8]], body:own[buf[u8]], count:u32)
+  v6:u32 = service_health_status svc
+  v7:u32 = add v6 count
+  v8:b1 = service_close svc
+  v9:b1 = drop body
+  v10:b1 = drop req
+  return v7
+
+block b4(svc:u64, req:own[buf[u8]], body:own[buf[u8]])
+  v11:b1 = service_close svc
+  v12:b1 = drop body
+  v13:b1 = drop req
+  return 0u32
+
+test t1
+  out 202u32
+end
+
+func messaging_replay_bench
+ret u32
+eff service net alloc
+cap service("advanced-messaging-replay")
+cap net("127.0.0.1:39582")
+spec kind=service constraints=[messaging,replay,portable_native]
+block b0
+  v0:u64 = service_open
+  v2:own[buf[u8]] = buf_lit POST\x20/replay\x20HTTP/1.1\r\nHost:\x20localhost\r\nContent-Type:\x20application/json\r\n\r\n{\x22resume\x22:2}
+  v3:b1 = service_route v2 POST /replay
+  v4:own[buf[u8]] = http_body v2
+  v5:u32 = json_get_u32 v4 resume
+  v6:b1 = eq v5 2u32
+  branch v3 b1(v0, v2, v4, v5, v6) b4(v0, v2, v4)
+
+block b1(svc:u64, req:own[buf[u8]], body:own[buf[u8]], resume:u32, resume_ok:b1)
+  branch resume_ok b3(svc, req, body, resume) b4(svc, req, body)
+
+block b3(svc:u64, req:own[buf[u8]], body:own[buf[u8]], resume:u32)
+  v7:u32 = service_health_status svc
+  v8:u32 = add resume v7
+  v9:b1 = service_close svc
+  v10:b1 = drop body
+  v11:b1 = drop req
+  return v8
+
+block b4(svc:u64, req:own[buf[u8]], body:own[buf[u8]])
+  v12:b1 = service_close svc
+  v13:b1 = drop body
+  v14:b1 = drop req
+  return 0u32
+
+test t2
+  out 202u32
+end

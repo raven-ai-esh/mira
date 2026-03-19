@@ -1,0 +1,32 @@
+module runtime.spawn.split@1
+target native
+
+func capture_echo_arg
+ret u8
+eff spawn alloc
+cap spawn("/bin/echo")
+spec kind=spawn constraints=[spawn,stdout_capture,argv,env,bytes]
+block b0
+  v0:own[buf[u8]] = spawn_capture_all /bin/echo HI env:GREETING=HELLO
+  v1:view[buf[u8]] = view v0
+  v2:u8 = load v1 0u32
+  v3:b1 = drop v0
+  return v2
+test t0
+  out 72u8
+end
+
+func capture_cat_stderr
+ret u8
+eff spawn alloc
+cap spawn("/bin/cat")
+spec kind=spawn constraints=[spawn,stderr_capture,bytes]
+block b0
+  v0:own[buf[u8]] = spawn_capture_stderr_all /bin/cat /definitely_missing_mira_file
+  v1:view[buf[u8]] = view v0
+  v2:u8 = load v1 0u32
+  v3:b1 = drop v0
+  return v2
+test t0
+  out 99u8
+end

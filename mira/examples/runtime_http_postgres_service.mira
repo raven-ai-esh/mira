@@ -1,0 +1,165 @@
+module runtime.http.postgres.service@1
+target native
+
+func route_lookup_status
+ret u32
+eff db net alloc
+cap net("127.0.0.1:39583")
+cap db("postgresql://miratest:miratest@127.0.0.1:55432/mira_test")
+spec kind=http constraints=[postgres,router,prepared,service]
+block b0
+  v0:own[buf[u8]] = buf_lit GET\x20/items/42\x20HTTP/1.1\r\nHost:\x20localhost\r\nAuthorization:\x20token-42\r\n\r\n
+  v1:view[buf[u8]] = view v0
+  v2:own[buf[u8]] = http_request_method v1
+  v3:view[buf[u8]] = view v2
+  v4:b1 = buf_eq_lit v3 GET
+  branch v4 b1(v0, v1, v2) b7(v0, v2)
+
+block b1(req:own[buf[u8]], req_view:view[buf[u8]], method:own[buf[u8]])
+  v5:own[buf[u8]] = http_request_path req_view
+  v6:view[buf[u8]] = view v5
+  v7:b1 = buf_eq_lit v6 /items/42
+  branch v7 b2(req, req_view, method, v5) b8(req, method, v5)
+
+block b2(req:own[buf[u8]], req_view:view[buf[u8]], method:own[buf[u8]], path:own[buf[u8]])
+  v8:b1 = http_header_eq req_view Authorization token-42
+  branch v8 b3(req, method, path) b9(req, method, path)
+
+block b3(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]])
+  v9:u64 = db_open postgresql://miratest:miratest@127.0.0.1:55432/mira_test
+  v10:own[buf[u8]] = buf_lit DROP\x20TABLE\x20IF\x20EXISTS\x20items;\x20CREATE\x20TABLE\x20items(id\x20INTEGER\x20PRIMARY\x20KEY,\x20value\x20TEXT\x20NOT\x20NULL);\x20INSERT\x20INTO\x20items(id,\x20value)\x20VALUES\x20(42,\x20\x27widget\x27);\x20
+  v11:b1 = db_exec v9 v10
+  v12:own[buf[u8]] = buf_lit SELECT\x20COUNT(*)\x20FROM\x20items\x20WHERE\x20id\x20=\x20$1;
+  v13:b1 = db_prepare v9 get_item v12
+  v14:own[buf[u8]] = buf_lit [42]
+  v15:u32 = db_query_prepared_u32 v9 get_item v14
+  v16:b1 = eq v15 1u32
+  branch v16 b4(req, method, path, v9, v10, v12, v14) b10(req, method, path, v9, v10, v12, v14)
+
+block b4(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]], dbh:u64, setup:own[buf[u8]], query_sql:own[buf[u8]], params:own[buf[u8]])
+  v18:b1 = db_close dbh
+  v19:b1 = drop params
+  v20:b1 = drop query_sql
+  v21:b1 = drop setup
+  v22:b1 = drop path
+  v23:b1 = drop method
+  v24:b1 = drop req
+  return 200u32
+
+block b7(req:own[buf[u8]], method:own[buf[u8]])
+  v43:b1 = drop method
+  v44:b1 = drop req
+  return 404u32
+
+block b8(req:own[buf[u8]], method:own[buf[u8]], route_buf:own[buf[u8]])
+  v45:b1 = drop route_buf
+  v46:b1 = drop method
+  v47:b1 = drop req
+  return 404u32
+
+block b9(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]])
+  v48:b1 = drop path
+  v49:b1 = drop method
+  v50:b1 = drop req
+  return 401u32
+
+block b10(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]], dbh:u64, setup:own[buf[u8]], query_sql:own[buf[u8]], params:own[buf[u8]])
+  v51:b1 = db_close dbh
+  v52:b1 = drop params
+  v53:b1 = drop query_sql
+  v54:b1 = drop setup
+  v55:b1 = drop path
+  v56:b1 = drop method
+  v57:b1 = drop req
+  return 404u32
+
+test t0
+  out 200u32
+end
+
+func serve_lookup_once
+ret u8
+eff db net alloc
+cap net("127.0.0.1:39583")
+cap db("postgresql://miratest:miratest@127.0.0.1:55432/mira_test")
+spec kind=http constraints=[postgres,listener,session]
+block b0
+  v0:u64 = net_listen
+  v1:u64 = http_session_accept v0
+  v2:own[buf[u8]] = http_session_request v1
+  v3:view[buf[u8]] = view v2
+  v4:b1 = http_method_eq v3 GET
+  branch v4 b1(v0, v1, v2, v3) b7(v0, v1, v2)
+
+block b1(listener:u64, conn:u64, req:own[buf[u8]], req_view:view[buf[u8]])
+  v5:b1 = http_path_eq req_view /items/42
+  branch v5 b2(listener, conn, req, req_view) b8(listener, conn, req)
+
+block b2(listener:u64, conn:u64, req:own[buf[u8]], req_view:view[buf[u8]])
+  v6:b1 = http_header_eq req_view Authorization token-42
+  branch v6 b3(listener, conn, req) b9(listener, conn, req)
+
+block b3(listener:u64, conn:u64, req:own[buf[u8]])
+  v7:u64 = db_open postgresql://miratest:miratest@127.0.0.1:55432/mira_test
+  v8:own[buf[u8]] = buf_lit DROP\x20TABLE\x20IF\x20EXISTS\x20items;\x20CREATE\x20TABLE\x20items(id\x20INTEGER\x20PRIMARY\x20KEY,\x20value\x20TEXT\x20NOT\x20NULL);\x20INSERT\x20INTO\x20items(id,\x20value)\x20VALUES\x20(42,\x20\x27widget\x27);\x20
+  v9:b1 = db_exec v7 v8
+  v10:own[buf[u8]] = buf_lit SELECT\x20COUNT(*)\x20FROM\x20items\x20WHERE\x20id\x20=\x20$1;
+  v11:b1 = db_prepare v7 get_item v10
+  v12:own[buf[u8]] = buf_lit [42]
+  v13:u32 = db_query_prepared_u32 v7 get_item v12
+  v14:b1 = eq v13 1u32
+  branch v14 b4(listener, conn, req, v7, v8, v10, v12) b10(listener, conn, req, v7, v8, v10, v12)
+
+block b4(listener:u64, conn:u64, req:own[buf[u8]], dbh:u64, setup:own[buf[u8]], query_sql:own[buf[u8]], params:own[buf[u8]])
+  v16:own[buf[u8]] = buf_lit \x7b\x22id\x22:42,\x22value\x22:\x22widget\x22\x7d
+  v17:b1 = http_session_write_json conn 200u32 v16
+  v18:b1 = db_close dbh
+  v19:b1 = http_session_close conn
+  v20:b1 = net_close listener
+  v21:b1 = drop v16
+  v22:b1 = drop params
+  v23:b1 = drop query_sql
+  v24:b1 = drop setup
+  v25:b1 = drop req
+  return 1u8
+
+block b7(listener:u64, conn:u64, req:own[buf[u8]])
+  v28:own[buf[u8]] = buf_lit NO
+  v29:b1 = http_session_write_text conn 404u32 v28
+  v30:b1 = http_session_close conn
+  v31:b1 = net_close listener
+  v32:b1 = drop v28
+  v33:b1 = drop req
+  return 0u8
+
+block b8(listener:u64, conn:u64, req:own[buf[u8]])
+  v34:own[buf[u8]] = buf_lit NO
+  v35:b1 = http_session_write_text conn 404u32 v34
+  v36:b1 = http_session_close conn
+  v37:b1 = net_close listener
+  v38:b1 = drop v34
+  v39:b1 = drop req
+  return 0u8
+
+block b9(listener:u64, conn:u64, req:own[buf[u8]])
+  v40:own[buf[u8]] = buf_lit NO
+  v41:b1 = http_session_write_text conn 401u32 v40
+  v42:b1 = http_session_close conn
+  v43:b1 = net_close listener
+  v44:b1 = drop v40
+  v45:b1 = drop req
+  return 0u8
+
+block b10(listener:u64, conn:u64, req:own[buf[u8]], dbh:u64, setup:own[buf[u8]], query_sql:own[buf[u8]], params:own[buf[u8]])
+  v46:own[buf[u8]] = buf_lit NO
+  v47:b1 = http_session_write_text conn 404u32 v46
+  v48:b1 = db_close dbh
+  v49:b1 = http_session_close conn
+  v50:b1 = net_close listener
+  v51:b1 = drop v46
+  v52:b1 = drop params
+  v53:b1 = drop query_sql
+  v54:b1 = drop setup
+  v55:b1 = drop req
+  return 0u8
+end

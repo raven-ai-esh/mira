@@ -1,0 +1,26 @@
+module runtime.tls.http.client@1
+target native
+
+func fetch_local_https_ok
+ret u8
+eff net alloc
+cap net("127.0.0.1:39574")
+spec kind=http constraints=[tls,client,response_parse]
+block b0
+  v0:own[buf[u8]] = buf_lit GET\x20/\x20HTTP/1.1\r\nHost:\x20localhost\r\nConnection:\x20close\r\n\r\n
+  v1:own[buf[u8]] = tls_exchange_all v0
+  v2:view[buf[u8]] = view v1
+  v3:u32 = http_status_u32 v2
+  v4:b1 = eq v3 200u32
+  branch v4 b1(v0, v1) b2(v0, v1)
+
+block b1(req:own[buf[u8]], resp:own[buf[u8]])
+  v5:b1 = drop resp
+  v6:b1 = drop req
+  return 1u8
+
+block b2(req:own[buf[u8]], resp:own[buf[u8]])
+  v7:b1 = drop resp
+  v8:b1 = drop req
+  return 0u8
+end

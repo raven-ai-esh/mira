@@ -1,0 +1,105 @@
+module runtime.queue.worker.service@1
+target native
+
+func process_single_job
+ret u8
+eff alloc queue cache config net
+cap queue("/tmp/mira_llm_1_2_jobs.queue")
+cap cache("/tmp/mira_llm_1_2_jobs.cache")
+cap net("127.0.0.1:1")
+cap config("worker_name=indexer,ack_ttl_ms=30000")
+spec kind=worker constraints=[queue,cache,transform,serialization]
+block b0
+  v0:b1 = config_has worker_name
+  branch v0 b1() b8
+
+block b1
+  v1:u64 = queue_open /tmp/mira_llm_1_2_jobs.queue
+  v2:u64 = cache_open /tmp/mira_llm_1_2_jobs.cache
+  v3:own[buf[u8]] = buf_lit \x20email:42\x20
+  v4:b1 = queue_push_buf v1 v3
+  v5:u32 = queue_len v1
+  v6:b1 = eq v5 1u32
+  branch v6 b2(v1, v2, v3) b6(v1, v2, v3)
+
+block b2(queueh:u64, cacheh:u64, seed:own[buf[u8]])
+  v7:own[buf[u8]] = queue_pop_buf queueh
+  v8:own[buf[u8]] = buf_trim_ascii v7
+  v9:view[buf[u8]] = view v8
+  v10:own[buf[u8]] = buf_before_lit v9 :
+  v11:own[buf[u8]] = buf_after_lit v9 :
+  v12:view[buf[u8]] = view v10
+  v13:b1 = buf_eq_lit v12 email
+  branch v13 b3(queueh, cacheh, seed, v7, v8, v10, v11) b9(queueh, cacheh, seed, v7, v8, v10, v11)
+
+block b3(queueh:u64, cacheh:u64, seed:own[buf[u8]], raw_job:own[buf[u8]], job:own[buf[u8]], kind:own[buf[u8]], id:own[buf[u8]])
+  v14:u32 = config_get_u32 ack_ttl_ms
+  v15:b1 = cache_set_buf_ttl cacheh id v14 job
+  v16:own[buf[u8]] = cache_get_buf cacheh id
+  v17:view[buf[u8]] = view v16
+  v18:b1 = buf_contains_lit v17 email:42
+  branch v18 b4(queueh, cacheh, seed, raw_job, job, kind, id, v16) b10(queueh, cacheh, seed, raw_job, job, kind, id, v16)
+
+block b4(queueh:u64, cacheh:u64, seed:own[buf[u8]], raw_job:own[buf[u8]], job:own[buf[u8]], kind:own[buf[u8]], id:own[buf[u8]], cached:own[buf[u8]])
+  v19:own[buf[u8]] = json_encode_arr kind id
+  v20:view[buf[u8]] = view v19
+  v21:b1 = buf_contains_lit v20 email
+  branch v21 b5(queueh, cacheh, seed, raw_job, job, kind, id, cached, v19) b11(queueh, cacheh, seed, raw_job, job, kind, id, cached, v19)
+
+block b5(queueh:u64, cacheh:u64, seed:own[buf[u8]], raw_job:own[buf[u8]], job:own[buf[u8]], kind:own[buf[u8]], id:own[buf[u8]], cached:own[buf[u8]], encoded:own[buf[u8]])
+  v22:b1 = queue_close queueh
+  v23:b1 = cache_close cacheh
+  v24:b1 = drop encoded
+  v25:b1 = drop cached
+  v26:b1 = drop id
+  v27:b1 = drop kind
+  v28:b1 = drop job
+  v29:b1 = drop raw_job
+  v30:b1 = drop seed
+  return 1u8
+
+block b8
+  return 0u8
+
+block b6(queueh:u64, cacheh:u64, seed:own[buf[u8]])
+  v31:b1 = queue_close queueh
+  v32:b1 = cache_close cacheh
+  v33:b1 = drop seed
+  return 0u8
+
+block b9(queueh:u64, cacheh:u64, seed:own[buf[u8]], raw_job:own[buf[u8]], job:own[buf[u8]], kind:own[buf[u8]], id:own[buf[u8]])
+  v34:b1 = queue_close queueh
+  v35:b1 = cache_close cacheh
+  v36:b1 = drop id
+  v37:b1 = drop kind
+  v38:b1 = drop job
+  v39:b1 = drop raw_job
+  v40:b1 = drop seed
+  return 0u8
+
+block b10(queueh:u64, cacheh:u64, seed:own[buf[u8]], raw_job:own[buf[u8]], job:own[buf[u8]], kind:own[buf[u8]], id:own[buf[u8]], cached:own[buf[u8]])
+  v41:b1 = queue_close queueh
+  v42:b1 = cache_close cacheh
+  v43:b1 = drop cached
+  v44:b1 = drop id
+  v45:b1 = drop kind
+  v46:b1 = drop job
+  v47:b1 = drop raw_job
+  v48:b1 = drop seed
+  return 0u8
+
+block b11(queueh:u64, cacheh:u64, seed:own[buf[u8]], raw_job:own[buf[u8]], job:own[buf[u8]], kind:own[buf[u8]], id:own[buf[u8]], cached:own[buf[u8]], encoded:own[buf[u8]])
+  v49:b1 = queue_close queueh
+  v50:b1 = cache_close cacheh
+  v51:b1 = drop encoded
+  v52:b1 = drop cached
+  v53:b1 = drop id
+  v54:b1 = drop kind
+  v55:b1 = drop job
+  v56:b1 = drop raw_job
+  v57:b1 = drop seed
+  return 0u8
+
+test t0
+  out 1u8
+end

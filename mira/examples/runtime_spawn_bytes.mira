@@ -1,0 +1,17 @@
+module runtime.spawn.bytes@1
+target native
+
+func capture_echo_newline
+ret u8
+eff spawn alloc
+cap spawn("/bin/echo")
+spec kind=spawn constraints=[spawn,stdout_capture,bytes]
+block b0
+  v0:own[buf[u8]] = spawn_capture_all /bin/echo
+  v1:view[buf[u8]] = view v0
+  v2:u8 = load v1 0u32
+  v3:b1 = drop v0
+  return v2
+test t0
+  out 10u8
+end

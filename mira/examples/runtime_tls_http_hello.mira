@@ -1,0 +1,31 @@
+module runtime.tls.http.hello@1
+target native
+
+func serve_https_hello_once
+ret u8
+eff net alloc
+cap net("127.0.0.1:39582")
+cap tls("cert=/tmp/mira_tls_server.crt,key=/tmp/mira_tls_server.key,request_timeout_ms=5000,session_timeout_ms=2000,shutdown_grace_ms=250")
+spec kind=http constraints=[tls,server,hello,unified_session]
+block b0
+  v0:u64 = tls_listen
+  v1:u32 = tls_server_config_u32 request_timeout_ms
+  v2:b1 = listener_set_timeout_ms v0 v1
+  v3:u32 = tls_server_config_u32 shutdown_grace_ms
+  v4:b1 = listener_set_shutdown_grace_ms v0 v3
+  v5:u64 = http_session_accept v0
+  v6:u32 = tls_server_config_u32 session_timeout_ms
+  v7:b1 = session_set_timeout_ms v5 v6
+  v8:own[buf[u8]] = tls_server_config_buf cert
+  v9:own[buf[u8]] = tls_server_config_buf key
+  v10:own[buf[u8]] = http_session_request v5
+  v11:own[buf[u8]] = buf_lit HELLO_TLS
+  v12:b1 = http_session_write_text v5 200u32 v11
+  v13:b1 = http_session_close v5
+  v14:b1 = net_close v0
+  v15:b1 = drop v11
+  v16:b1 = drop v10
+  v17:b1 = drop v9
+  v18:b1 = drop v8
+  return 1u8
+end

@@ -1,0 +1,35 @@
+module runtime.many.idle.sessions@1
+target native
+
+func anchor_ok
+ret u8
+eff alloc
+block b0
+  return 1u8
+test t0
+  out 1u8
+end
+
+func drain_three_idle_sessions
+ret u8
+eff net alloc
+cap net("127.0.0.1:39623")
+spec kind=realtime constraints=[transport,idle_sessions,stability]
+block b0
+  v0:u64 = net_listen
+  v1:u64 = net_accept v0
+  v2:u32 = session_backpressure v1
+  v3:b1 = session_backpressure_wait v1 0u32
+  v4:b1 = net_close v1
+  v5:u64 = net_accept v0
+  v6:u32 = session_backpressure v5
+  v7:b1 = session_backpressure_wait v5 0u32
+  v8:b1 = net_close v5
+  v9:u64 = net_accept v0
+  v10:b1 = session_alive v9
+  v11:u32 = session_backpressure v9
+  v12:b1 = session_backpressure_wait v9 0u32
+  v13:b1 = net_close v9
+  v14:b1 = net_close v0
+  return 3u8
+end

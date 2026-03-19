@@ -1,0 +1,62 @@
+module runtime.service.worker.template@1
+target native
+
+func worker_job
+arg job:u32
+ret u32
+eff spawn clock
+cap clock("monotonic")
+spec kind=runtime constraints=[worker,task]
+block b0
+  v0:b1 = task_sleep_ms 1u32
+  v1:u32 = add job 300u32
+  return v1
+end
+
+func run_worker_template
+ret u32
+eff service spawn clock alloc
+cap service("inventory-worker")
+cap clock("monotonic")
+spec kind=service constraints=[worker,logging,metrics,tracing,lifecycle]
+block b0
+  v0:u64 = service_open
+  v1:own[buf[u8]] = buf_lit worker-start
+  v2:b1 = service_log v0 info v1
+  v3:u64 = service_trace_begin v0 batch
+  v4:u64 = rt_open 2u32
+  v5:u64 = rt_spawn_u32 v4 worker_job 1u32
+  v6:u64 = rt_spawn_u32 v4 worker_job 2u32
+  v7:u32 = rt_join_u32 v5
+  v8:u32 = rt_join_u32 v6
+  v9:u32 = add v7 v8
+  v10:b1 = service_metric_count v0 jobs_completed 2u32
+  v11:u32 = service_health_status v0
+  v12:b1 = eq v11 200u32
+  branch v12 b1(v0, v1, v3, v4, v5, v6, v9) b2(v0, v1, v3, v4, v5, v6)
+
+block b1(service:u64, start_msg:own[buf[u8]], trace:u64, runtime:u64, task_a:u64, task_b:u64, result:u32)
+  v13:b1 = rt_task_close task_a
+  v14:b1 = rt_task_close task_b
+  v15:b1 = rt_shutdown runtime 20u32
+  v16:b1 = rt_close runtime
+  v17:b1 = service_trace_end trace
+  v18:b1 = service_shutdown service 10u32
+  v19:b1 = service_close service
+  v20:b1 = drop start_msg
+  return result
+
+block b2(service:u64, start_msg:own[buf[u8]], trace:u64, runtime:u64, task_a:u64, task_b:u64)
+  v21:b1 = rt_task_close task_a
+  v22:b1 = rt_task_close task_b
+  v23:b1 = rt_shutdown runtime 20u32
+  v24:b1 = rt_close runtime
+  v25:b1 = service_trace_end trace
+  v26:b1 = service_shutdown service 10u32
+  v27:b1 = service_close service
+  v28:b1 = drop start_msg
+  return 0u32
+
+test t0
+  out 603u32
+end

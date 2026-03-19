@@ -1,0 +1,125 @@
+module runtime.metrics.ingest.api@1
+target native
+
+func ingest_metric_request
+ret u8
+eff queue cache net alloc fs.write
+cap queue("/tmp/mira_2_3_metrics.stream")
+cap cache("/tmp/mira_2_3_metrics.cache")
+cap net("127.0.0.1:1")
+cap fs("/tmp/mira_2_3_metrics.stream")
+spec kind=http constraints=[analytics,ingest,stream,cache,aggregation,window]
+block b0
+  v0:own[buf[u8]] = buf_lit POST\x20/metrics\x20HTTP/1.1\r\nHost:\x20localhost\r\nContent-Type:\x20application/json\r\n\r\n{\x22value\x22:7}
+  v1:view[buf[u8]] = view v0
+  v2:b1 = http_method_eq v1 POST
+  branch v2 b1(v0, v1) b9(v0)
+
+block b1(req:own[buf[u8]], req_view:view[buf[u8]])
+  v3:b1 = http_path_eq req_view /metrics
+  branch v3 b2(req, req_view) b9(req)
+
+block b2(req:own[buf[u8]], req_view:view[buf[u8]])
+  v4:own[buf[u8]] = http_body req_view
+  v5:u32 = json_get_u32 v4 value
+  v6:b1 = eq v5 7u32
+  branch v6 b3(req, v4) b10(req, v4)
+
+block b3(req:own[buf[u8]], body:own[buf[u8]])
+  v53:own[buf[u8]] = alloc arena 0u32
+  v54:view[buf[u8]] = view v53
+  v55:b1 = fs_write_all v54
+  v56:b1 = drop v53
+  v7:u64 = stream_open /tmp/mira_2_3_metrics.stream
+  v8:u64 = cache_open /tmp/mira_2_3_metrics.cache
+  v9:u64 = agg_open_u64
+  v10:u64 = batch_open
+  v11:u64 = window_open_ms 60000u32
+  v12:u32 = stream_publish_buf v7 body
+  v13:u32 = stream_len v7
+  v14:own[buf[u8]] = buf_lit latest
+  v15:b1 = cache_set_buf v8 v14 body
+  v16:own[buf[u8]] = cache_get_buf v8 v14
+  v17:b1 = agg_add_u64 v9 7u64
+  v18:b1 = batch_push_u64 v10 7u64
+  v19:b1 = window_add_u64 v11 7u64
+  v20:u64 = agg_sum_u64 v9
+  v21:u64 = agg_avg_u64 v9
+  v22:u64 = batch_flush_sum_u64 v10
+  v23:u64 = window_avg_u64 v11
+  v24:view[buf[u8]] = view v16
+  v25:b1 = buf_contains_lit v24 \x22value\x22:7
+  v26:b1 = eq v12 1u32
+  branch v26 b4(req, body, v7, v8, v9, v10, v11, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v25, v13) b11(req, body, v7, v8, v9, v10, v11, v14, v16)
+
+block b4(req:own[buf[u8]], body:own[buf[u8]], streamh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, key:own[buf[u8]], cache_ok:b1, cached:own[buf[u8]], agg_ok:b1, batch_ok:b1, win_ok:b1, sum:u64, avg:u64, flushed:u64, win_avg:u64, cache_match:b1, stream_len_val:u32)
+  v27:b1 = eq stream_len_val 1u32
+  branch v27 b5(req, body, streamh, cacheh, aggh, batchh, winh, key, cache_ok, cached, agg_ok, batch_ok, win_ok, sum, avg, flushed, win_avg, cache_match) b11(req, body, streamh, cacheh, aggh, batchh, winh, key, cached)
+
+block b5(req:own[buf[u8]], body:own[buf[u8]], streamh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, key:own[buf[u8]], cache_ok:b1, cached:own[buf[u8]], agg_ok:b1, batch_ok:b1, win_ok:b1, sum:u64, avg:u64, flushed:u64, win_avg:u64, cache_match:b1)
+  branch cache_ok b6(req, body, streamh, cacheh, aggh, batchh, winh, key, cached, agg_ok, batch_ok, win_ok, sum, avg, flushed, win_avg, cache_match) b11(req, body, streamh, cacheh, aggh, batchh, winh, key, cached)
+
+block b6(req:own[buf[u8]], body:own[buf[u8]], streamh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, key:own[buf[u8]], cached:own[buf[u8]], agg_ok:b1, batch_ok:b1, win_ok:b1, sum:u64, avg:u64, flushed:u64, win_avg:u64, cache_match:b1)
+  branch agg_ok b7(req, body, streamh, cacheh, aggh, batchh, winh, key, cached, batch_ok, win_ok, sum, avg, flushed, win_avg, cache_match) b11(req, body, streamh, cacheh, aggh, batchh, winh, key, cached)
+
+block b7(req:own[buf[u8]], body:own[buf[u8]], streamh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, key:own[buf[u8]], cached:own[buf[u8]], batch_ok:b1, win_ok:b1, sum:u64, avg:u64, flushed:u64, win_avg:u64, cache_match:b1)
+  branch batch_ok b8(req, body, streamh, cacheh, aggh, batchh, winh, key, cached, win_ok, sum, avg, flushed, win_avg, cache_match) b11(req, body, streamh, cacheh, aggh, batchh, winh, key, cached)
+
+block b8(req:own[buf[u8]], body:own[buf[u8]], streamh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, key:own[buf[u8]], cached:own[buf[u8]], win_ok:b1, sum:u64, avg:u64, flushed:u64, win_avg:u64, cache_match:b1)
+  branch win_ok b12(req, body, streamh, cacheh, aggh, batchh, winh, key, cached, sum, avg, flushed, win_avg, cache_match) b11(req, body, streamh, cacheh, aggh, batchh, winh, key, cached)
+
+block b12(req:own[buf[u8]], body:own[buf[u8]], streamh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, key:own[buf[u8]], cached:own[buf[u8]], sum:u64, avg:u64, flushed:u64, win_avg:u64, cache_match:b1)
+  v28:b1 = eq sum 7u64
+  branch v28 b13(req, body, streamh, cacheh, aggh, batchh, winh, key, cached, avg, flushed, win_avg, cache_match) b11(req, body, streamh, cacheh, aggh, batchh, winh, key, cached)
+
+block b13(req:own[buf[u8]], body:own[buf[u8]], streamh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, key:own[buf[u8]], cached:own[buf[u8]], avg:u64, flushed:u64, win_avg:u64, cache_match:b1)
+  v29:b1 = eq avg 7u64
+  branch v29 b14(req, body, streamh, cacheh, aggh, batchh, winh, key, cached, flushed, win_avg, cache_match) b11(req, body, streamh, cacheh, aggh, batchh, winh, key, cached)
+
+block b14(req:own[buf[u8]], body:own[buf[u8]], streamh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, key:own[buf[u8]], cached:own[buf[u8]], flushed:u64, win_avg:u64, cache_match:b1)
+  v30:b1 = eq flushed 7u64
+  branch v30 b15(req, body, streamh, cacheh, aggh, batchh, winh, key, cached, win_avg, cache_match) b11(req, body, streamh, cacheh, aggh, batchh, winh, key, cached)
+
+block b15(req:own[buf[u8]], body:own[buf[u8]], streamh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, key:own[buf[u8]], cached:own[buf[u8]], win_avg:u64, cache_match:b1)
+  v31:b1 = eq win_avg 7u64
+  branch v31 b16(req, body, streamh, cacheh, aggh, batchh, winh, key, cached, cache_match) b11(req, body, streamh, cacheh, aggh, batchh, winh, key, cached)
+
+block b16(req:own[buf[u8]], body:own[buf[u8]], streamh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, key:own[buf[u8]], cached:own[buf[u8]], cache_match:b1)
+  branch cache_match b17(req, body, streamh, cacheh, aggh, batchh, winh, key, cached) b11(req, body, streamh, cacheh, aggh, batchh, winh, key, cached)
+
+block b17(req:own[buf[u8]], body:own[buf[u8]], streamh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, key:own[buf[u8]], cached:own[buf[u8]])
+  v32:b1 = window_close winh
+  v33:b1 = batch_close batchh
+  v34:b1 = agg_close aggh
+  v35:b1 = cache_close cacheh
+  v36:b1 = stream_close streamh
+  v37:b1 = drop cached
+  v38:b1 = drop key
+  v39:b1 = drop body
+  v40:b1 = drop req
+  return 1u8
+
+block b9(req:own[buf[u8]])
+  v41:b1 = drop req
+  return 0u8
+
+block b10(req:own[buf[u8]], body:own[buf[u8]])
+  v42:b1 = drop body
+  v43:b1 = drop req
+  return 0u8
+
+block b11(req:own[buf[u8]], body:own[buf[u8]], streamh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, key:own[buf[u8]], cached:own[buf[u8]])
+  v44:b1 = window_close winh
+  v45:b1 = batch_close batchh
+  v46:b1 = agg_close aggh
+  v47:b1 = cache_close cacheh
+  v48:b1 = stream_close streamh
+  v49:b1 = drop cached
+  v50:b1 = drop key
+  v51:b1 = drop body
+  v52:b1 = drop req
+  return 0u8
+
+test t0
+  out 1u8
+end

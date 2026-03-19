@@ -1,0 +1,59 @@
+module runtime.http.server.framework@1
+target native
+
+func serve_secure_once
+ret u8
+eff net alloc
+cap net("127.0.0.1:39571")
+spec kind=http constraints=[http,server,router,middleware,response_headers]
+block b0
+  v0:u64 = net_listen
+  v1:u64 = http_session_accept v0
+  v2:own[buf[u8]] = http_session_request v1
+  v3:view[buf[u8]] = view v2
+  v4:b1 = http_method_eq v3 GET
+  branch v4 b1(v0, v1, v2, v3) b5(v0, v1, v2)
+
+block b1(listener:u64, conn:u64, req:own[buf[u8]], req_view:view[buf[u8]])
+  v5:b1 = http_path_eq req_view /secure
+  branch v5 b2(listener, conn, req, req_view) b5(listener, conn, req)
+
+block b2(listener:u64, conn:u64, req:own[buf[u8]], req_view:view[buf[u8]])
+  v6:own[buf[u8]] = http_header req_view Authorization
+  v7:view[buf[u8]] = view v6
+  v8:b1 = buf_eq_lit v7 token-42
+  branch v8 b3(listener, conn, req, v6) b4(listener, conn, req, v6)
+
+block b3(listener:u64, conn:u64, req:own[buf[u8]], auth:own[buf[u8]])
+  v9:own[buf[u8]] = buf_lit \x7b\x22ok\x22:
+  v10:own[buf[u8]] = buf_lit true\x7d
+  v11:own[buf[u8]] = buf_concat v9 v10
+  v12:b1 = http_session_write_json conn 200u32 v11
+  v13:b1 = http_session_close conn
+  v14:b1 = net_close listener
+  v15:b1 = drop v11
+  v16:b1 = drop v10
+  v17:b1 = drop v9
+  v18:b1 = drop auth
+  v19:b1 = drop req
+  return 1u8
+
+block b4(listener:u64, conn:u64, req:own[buf[u8]], auth:own[buf[u8]])
+  v20:own[buf[u8]] = buf_lit NO
+  v21:b1 = http_session_write_text conn 403u32 v20
+  v22:b1 = http_session_close conn
+  v23:b1 = net_close listener
+  v24:b1 = drop v20
+  v25:b1 = drop auth
+  v26:b1 = drop req
+  return 0u8
+
+block b5(listener:u64, conn:u64, req:own[buf[u8]])
+  v27:own[buf[u8]] = buf_lit NO
+  v28:b1 = http_session_write_text conn 404u32 v27
+  v29:b1 = http_session_close conn
+  v30:b1 = net_close listener
+  v31:b1 = drop v27
+  v32:b1 = drop req
+  return 0u8
+end

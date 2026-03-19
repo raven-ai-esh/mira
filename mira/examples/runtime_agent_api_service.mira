@@ -1,0 +1,43 @@
+module runtime.agent.api.service@1
+target native
+
+func maintained_agent_api_status
+ret u32
+eff service net alloc
+cap service("agent-platform-api")
+cap net("127.0.0.1:39582")
+spec kind=service constraints=[agent_platform,maintained,http,json,portable_native]
+block b0
+  v0:u64 = service_open
+  v1:own[buf[u8]] = buf_lit POST\x20/status\x20HTTP/1.1\r\nHost:\x20localhost\r\nContent-Type:\x20application/json\r\n\r\n{\x22delta\x22:42}
+  v2:b1 = service_route v1 POST /status
+  v3:own[buf[u8]] = http_body v1
+  v4:u32 = json_get_u32 v3 delta
+  v5:b1 = eq v4 42u32
+  branch v2 b1(v0, v1, v3, v5, v4) b4(v0, v1, v3)
+
+block b1(svc:u64, req:own[buf[u8]], body:own[buf[u8]], json_ok:b1, delta:u32)
+  branch json_ok b2(svc, req, body, delta) b4(svc, req, body)
+
+block b2(svc:u64, req:own[buf[u8]], body:own[buf[u8]], delta:u32)
+  v6:u32 = service_health_status svc
+  v7:u32 = service_readiness_status svc
+  v8:b1 = eq v7 503u32
+  branch v8 b3(svc, req, body, delta, v6) b4(svc, req, body)
+
+block b3(svc:u64, req:own[buf[u8]], body:own[buf[u8]], delta:u32, health:u32)
+  v9:u32 = add delta health
+  v10:b1 = service_close svc
+  v11:b1 = drop body
+  v12:b1 = drop req
+  return v9
+
+block b4(svc:u64, req:own[buf[u8]], body:own[buf[u8]])
+  v13:b1 = service_close svc
+  v14:b1 = drop body
+  v15:b1 = drop req
+  return 0u32
+
+test t0
+  out 242u32
+end

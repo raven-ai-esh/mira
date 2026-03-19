@@ -1,0 +1,21 @@
+module runtime.spawn.handle@1
+target native
+
+func capture_echo_via_handle
+ret u8
+eff spawn alloc
+cap spawn("/bin/echo")
+spec kind=spawn constraints=[spawn,handle,stdout,bytes]
+block b0
+  v0:u64 = spawn_open /bin/echo HI
+  v1:i32 = spawn_wait v0
+  v2:own[buf[u8]] = spawn_stdout_all v0
+  v3:view[buf[u8]] = view v2
+  v4:u8 = load v3 0u32
+  v5:b1 = spawn_close v0
+  v6:b1 = drop v2
+  return v4
+
+test t0
+  out 72u8
+end

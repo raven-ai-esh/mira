@@ -1,0 +1,58 @@
+module runtime.recovery.worker.service@1
+target native
+
+func recover_worker_cursor
+ret u32
+eff service spawn alloc
+cap service("recovery-worker")
+spec kind=runtime constraints=[checkpoint,recovery,supervisor]
+block b0
+  v0:u64 = service_open
+  v1:u64 = supervisor_open 1u32 1u32
+  v2:b1 = service_checkpoint_save_u32 v0 cursor 17u32
+  v3:b1 = supervisor_record_failure v1 500u32
+  v4:b1 = service_failure_count v0 worker_crash 1u32
+  v5:b1 = supervisor_should_restart v1
+  branch v5 b1(v0, v1) b9(v0, v1)
+
+block b1(service:u64, sup:u64)
+  v6:b1 = service_checkpoint_exists service cursor
+  branch v6 b2(service, sup) b9(service, sup)
+
+block b2(service:u64, sup:u64)
+  v7:u32 = service_checkpoint_load_u32 service cursor
+  v8:b1 = eq v7 17u32
+  branch v8 b3(service, sup, v7) b9(service, sup)
+
+block b3(service:u64, sup:u64, cursor:u32)
+  v9:b1 = supervisor_record_recovery sup
+  v10:own[buf[u8]] = buf_lit worker_recovered
+  v11:b1 = service_event service recovered v10
+  v12:b1 = service_metric_count_dim service restart_total worker 1u32
+  v13:b1 = service_set_degraded service false
+  v14:u32 = service_event_total service recovered
+  v15:u32 = service_metric_total service restart_total
+  v16:b1 = service_close service
+  v17:b1 = supervisor_close sup
+  v18:b1 = drop v10
+  v19:b1 = eq v14 1u32
+  branch v19 b4(cursor, v15) b10
+
+block b4(cursor:u32, metrics:u32)
+  v20:b1 = eq metrics 1u32
+  branch v20 b5(cursor) b10
+
+block b5(cursor:u32)
+  return cursor
+
+block b9(service:u64, sup:u64)
+  v21:b1 = service_close service
+  v22:b1 = supervisor_close sup
+  return 0u32
+
+block b10
+  return 0u32
+
+test t0
+  out 17u32
+end

@@ -1,0 +1,171 @@
+module runtime.aggregation.worker.service@1
+target native
+
+func aggregate_two_jobs
+ret u8
+eff queue cache alloc
+cap queue("/tmp/mira_2_3_agg.queue")
+cap cache("/tmp/mira_2_3_agg.cache")
+spec kind=worker constraints=[analytics,aggregation,batch,window,queue,cache]
+block b0
+  v0:u64 = queue_open /tmp/mira_2_3_agg.queue
+  v1:u64 = cache_open /tmp/mira_2_3_agg.cache
+  v2:u64 = agg_open_u64
+  v3:u64 = batch_open
+  v4:u64 = window_open_ms 60000u32
+  v5:own[buf[u8]] = buf_lit job-5
+  v6:own[buf[u8]] = buf_lit job-9
+  v7:b1 = queue_push_buf v0 v5
+  v8:b1 = queue_push_buf v0 v6
+  v9:u32 = queue_len v0
+  v10:b1 = eq v9 2u32
+  branch v10 b1(v0, v1, v2, v3, v4, v5, v6) b8(v0, v1, v2, v3, v4, v5, v6)
+
+block b1(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]])
+  v11:own[buf[u8]] = queue_pop_buf queueh
+  v12:own[buf[u8]] = queue_pop_buf queueh
+  v13:view[buf[u8]] = view v11
+  v14:view[buf[u8]] = view v12
+  v15:b1 = buf_contains_lit v13 5
+  v16:b1 = buf_contains_lit v14 9
+  branch v15 b2(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, v11, v12, v16) b23(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, v11, v12)
+
+block b2(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], job_b_ok:b1)
+  branch job_b_ok b3(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b) b23(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b)
+
+block b3(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]])
+  v17:b1 = agg_add_u64 aggh 5u64
+  v18:b1 = agg_add_u64 aggh 9u64
+  v19:b1 = batch_push_u64 batchh 5u64
+  v20:b1 = batch_push_u64 batchh 9u64
+  v21:b1 = window_add_u64 winh 5u64
+  v22:b1 = window_add_u64 winh 9u64
+  v23:u32 = agg_count aggh
+  v24:u64 = agg_sum_u64 aggh
+  v25:u64 = agg_avg_u64 aggh
+  v26:u64 = agg_min_u64 aggh
+  v27:u64 = agg_max_u64 aggh
+  v28:u32 = batch_len batchh
+  v29:u64 = batch_flush_sum_u64 batchh
+  v30:u32 = window_count winh
+  v31:u64 = window_avg_u64 winh
+  v32:own[buf[u8]] = buf_lit sum-14
+  v33:own[buf[u8]] = buf_lit latest
+  v34:b1 = cache_set_buf cacheh v33 v32
+  v35:own[buf[u8]] = cache_get_buf cacheh v33
+  v36:view[buf[u8]] = view v35
+  v37:b1 = buf_contains_lit v36 sum-14
+  v38:b1 = eq v23 2u32
+  branch v38 b4(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, v32, v33, v35, v17, v18, v19, v20, v21, v22, v24, v25, v26, v27, v28, v29, v30, v31, v34, v37) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, v32, v33, v35)
+
+block b4(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]], agg_ok_a:b1, agg_ok_b:b1, batch_ok_a:b1, batch_ok_b:b1, win_ok_a:b1, win_ok_b:b1, sum:u64, avg:u64, minv:u64, maxv:u64, batch_len_val:u32, flushed:u64, window_count_val:u32, window_avg_val:u64, cache_ok:b1, cache_match:b1)
+  branch agg_ok_a b5(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached, agg_ok_b, batch_ok_a, batch_ok_b, win_ok_a, win_ok_b, sum, avg, minv, maxv, batch_len_val, flushed, window_count_val, window_avg_val, cache_ok, cache_match) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached)
+
+block b5(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]], agg_ok_b:b1, batch_ok_a:b1, batch_ok_b:b1, win_ok_a:b1, win_ok_b:b1, sum:u64, avg:u64, minv:u64, maxv:u64, batch_len_val:u32, flushed:u64, window_count_val:u32, window_avg_val:u64, cache_ok:b1, cache_match:b1)
+  branch agg_ok_b b6(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached, batch_ok_a, batch_ok_b, win_ok_a, win_ok_b, sum, avg, minv, maxv, batch_len_val, flushed, window_count_val, window_avg_val, cache_ok, cache_match) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached)
+
+block b6(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]], batch_ok_a:b1, batch_ok_b:b1, win_ok_a:b1, win_ok_b:b1, sum:u64, avg:u64, minv:u64, maxv:u64, batch_len_val:u32, flushed:u64, window_count_val:u32, window_avg_val:u64, cache_ok:b1, cache_match:b1)
+  branch batch_ok_a b7(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached, batch_ok_b, win_ok_a, win_ok_b, sum, avg, minv, maxv, batch_len_val, flushed, window_count_val, window_avg_val, cache_ok, cache_match) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached)
+
+block b7(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]], batch_ok_b:b1, win_ok_a:b1, win_ok_b:b1, sum:u64, avg:u64, minv:u64, maxv:u64, batch_len_val:u32, flushed:u64, window_count_val:u32, window_avg_val:u64, cache_ok:b1, cache_match:b1)
+  branch batch_ok_b b10(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached, win_ok_a, win_ok_b, sum, avg, minv, maxv, batch_len_val, flushed, window_count_val, window_avg_val, cache_ok, cache_match) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached)
+
+block b10(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]], win_ok_a:b1, win_ok_b:b1, sum:u64, avg:u64, minv:u64, maxv:u64, batch_len_val:u32, flushed:u64, window_count_val:u32, window_avg_val:u64, cache_ok:b1, cache_match:b1)
+  branch win_ok_a b11(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached, win_ok_b, sum, avg, minv, maxv, batch_len_val, flushed, window_count_val, window_avg_val, cache_ok, cache_match) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached)
+
+block b11(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]], win_ok_b:b1, sum:u64, avg:u64, minv:u64, maxv:u64, batch_len_val:u32, flushed:u64, window_count_val:u32, window_avg_val:u64, cache_ok:b1, cache_match:b1)
+  branch win_ok_b b12(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached, sum, avg, minv, maxv, batch_len_val, flushed, window_count_val, window_avg_val, cache_ok, cache_match) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached)
+
+block b12(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]], sum:u64, avg:u64, minv:u64, maxv:u64, batch_len_val:u32, flushed:u64, window_count_val:u32, window_avg_val:u64, cache_ok:b1, cache_match:b1)
+  v39:b1 = eq sum 14u64
+  branch v39 b13(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached, avg, minv, maxv, batch_len_val, flushed, window_count_val, window_avg_val, cache_ok, cache_match) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached)
+
+block b13(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]], avg:u64, minv:u64, maxv:u64, batch_len_val:u32, flushed:u64, window_count_val:u32, window_avg_val:u64, cache_ok:b1, cache_match:b1)
+  v40:b1 = eq avg 7u64
+  branch v40 b14(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached, minv, maxv, batch_len_val, flushed, window_count_val, window_avg_val, cache_ok, cache_match) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached)
+
+block b14(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]], minv:u64, maxv:u64, batch_len_val:u32, flushed:u64, window_count_val:u32, window_avg_val:u64, cache_ok:b1, cache_match:b1)
+  v41:b1 = eq minv 5u64
+  branch v41 b15(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached, maxv, batch_len_val, flushed, window_count_val, window_avg_val, cache_ok, cache_match) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached)
+
+block b15(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]], maxv:u64, batch_len_val:u32, flushed:u64, window_count_val:u32, window_avg_val:u64, cache_ok:b1, cache_match:b1)
+  v42:b1 = eq maxv 9u64
+  branch v42 b16(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached, batch_len_val, flushed, window_count_val, window_avg_val, cache_ok, cache_match) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached)
+
+block b16(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]], batch_len_val:u32, flushed:u64, window_count_val:u32, window_avg_val:u64, cache_ok:b1, cache_match:b1)
+  v43:b1 = eq batch_len_val 2u32
+  branch v43 b17(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached, flushed, window_count_val, window_avg_val, cache_ok, cache_match) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached)
+
+block b17(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]], flushed:u64, window_count_val:u32, window_avg_val:u64, cache_ok:b1, cache_match:b1)
+  v44:b1 = eq flushed 14u64
+  branch v44 b18(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached, window_count_val, window_avg_val, cache_ok, cache_match) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached)
+
+block b18(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]], window_count_val:u32, window_avg_val:u64, cache_ok:b1, cache_match:b1)
+  v45:b1 = eq window_count_val 2u32
+  branch v45 b19(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached, window_avg_val, cache_ok, cache_match) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached)
+
+block b19(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]], window_avg_val:u64, cache_ok:b1, cache_match:b1)
+  v46:b1 = eq window_avg_val 7u64
+  branch v46 b20(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached, cache_ok, cache_match) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached)
+
+block b20(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]], cache_ok:b1, cache_match:b1)
+  branch cache_ok b21(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached, cache_match) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached)
+
+block b21(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]], cache_match:b1)
+  branch cache_match b22(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached) b9(queueh, cacheh, aggh, batchh, winh, seed_a, seed_b, job_a, job_b, summary, key, cached)
+
+block b22(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]])
+  v47:b1 = window_close winh
+  v48:b1 = batch_close batchh
+  v49:b1 = agg_close aggh
+  v50:b1 = cache_close cacheh
+  v51:b1 = queue_close queueh
+  v52:b1 = drop cached
+  v53:b1 = drop key
+  v54:b1 = drop summary
+  v55:b1 = drop job_b
+  v56:b1 = drop job_a
+  v57:b1 = drop seed_b
+  v58:b1 = drop seed_a
+  return 1u8
+
+block b8(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]])
+  v59:b1 = window_close winh
+  v60:b1 = batch_close batchh
+  v61:b1 = agg_close aggh
+  v62:b1 = cache_close cacheh
+  v63:b1 = queue_close queueh
+  v64:b1 = drop seed_b
+  v65:b1 = drop seed_a
+  return 0u8
+
+block b9(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]], summary:own[buf[u8]], key:own[buf[u8]], cached:own[buf[u8]])
+  v66:b1 = window_close winh
+  v67:b1 = batch_close batchh
+  v68:b1 = agg_close aggh
+  v69:b1 = cache_close cacheh
+  v70:b1 = queue_close queueh
+  v71:b1 = drop cached
+  v72:b1 = drop key
+  v73:b1 = drop summary
+  v74:b1 = drop job_b
+  v75:b1 = drop job_a
+  v76:b1 = drop seed_b
+  v77:b1 = drop seed_a
+  return 0u8
+
+block b23(queueh:u64, cacheh:u64, aggh:u64, batchh:u64, winh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], job_a:own[buf[u8]], job_b:own[buf[u8]])
+  v78:b1 = window_close winh
+  v79:b1 = batch_close batchh
+  v80:b1 = agg_close aggh
+  v81:b1 = cache_close cacheh
+  v82:b1 = queue_close queueh
+  v83:b1 = drop job_b
+  v84:b1 = drop job_a
+  v85:b1 = drop seed_b
+  v86:b1 = drop seed_a
+  return 0u8
+
+test t0
+  out 1u8
+end

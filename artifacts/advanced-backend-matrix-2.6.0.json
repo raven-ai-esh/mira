@@ -1,0 +1,257 @@
+{
+  "release": "2.6.0",
+  "generated_at": "2026-03-19T03:07:16Z",
+  "selected_backend": "mira_default",
+  "selection_rationale": "`mira_default` selected for the 2.6.0 advanced workload matrix because it stays near-parity or better against the fastest foreign baseline on 6/6 workloads, while leading clearly on 4 promoted paths.",
+  "rank_first_for_promoted_workload_classes": true,
+  "results": [
+    {
+      "workload": "messaging_transport",
+      "label": "Messaging transport request path",
+      "runtime": "go",
+      "median_ns": 419166,
+      "p95_ns": 423542,
+      "p99_ns": 423542,
+      "per_call_ns": 4191.66,
+      "units_per_second": 238568.96790293106,
+      "max_rss_bytes": 5947392
+    },
+    {
+      "workload": "messaging_transport",
+      "label": "Messaging transport request path",
+      "runtime": "rust",
+      "median_ns": 433792,
+      "p95_ns": 436334,
+      "p99_ns": 436334,
+      "per_call_ns": 4337.92,
+      "units_per_second": 230525.229,
+      "max_rss_bytes": 1638400
+    },
+    {
+      "workload": "messaging_transport",
+      "label": "Messaging transport request path",
+      "runtime": "mira_default",
+      "median_ns": 62000,
+      "p95_ns": 65000,
+      "p99_ns": 65000,
+      "per_call_ns": 620.0,
+      "units_per_second": 1612903.226,
+      "max_rss_bytes": 101793792,
+      "classification": "ahead",
+      "best_foreign_runtime": "go",
+      "best_foreign_median_ns": 419166
+    },
+    {
+      "workload": "messaging_fanout",
+      "label": "Messaging room fanout",
+      "runtime": "go",
+      "median_ns": 52042,
+      "p95_ns": 57084,
+      "p99_ns": 57084,
+      "per_call_ns": 1040.84,
+      "units_per_second": 1921524.9221782407,
+      "max_rss_bytes": 5013504
+    },
+    {
+      "workload": "messaging_fanout",
+      "label": "Messaging room fanout",
+      "runtime": "rust",
+      "median_ns": 73208,
+      "p95_ns": 73375,
+      "p99_ns": 73375,
+      "per_call_ns": 1464.16,
+      "units_per_second": 1365970.932,
+      "max_rss_bytes": 1703936
+    },
+    {
+      "workload": "messaging_fanout",
+      "label": "Messaging room fanout",
+      "runtime": "mira_default",
+      "median_ns": 32000,
+      "p95_ns": 33000,
+      "p99_ns": 33000,
+      "per_call_ns": 640.0,
+      "units_per_second": 3125000.0,
+      "max_rss_bytes": 100892672,
+      "classification": "ahead",
+      "best_foreign_runtime": "go",
+      "best_foreign_median_ns": 52042
+    },
+    {
+      "workload": "messaging_replay",
+      "label": "Messaging offline replay",
+      "runtime": "go",
+      "median_ns": 31250,
+      "p95_ns": 32083,
+      "p99_ns": 32083,
+      "per_call_ns": 625,
+      "units_per_second": 3200000,
+      "max_rss_bytes": 4636672
+    },
+    {
+      "workload": "messaging_replay",
+      "label": "Messaging offline replay",
+      "runtime": "rust",
+      "median_ns": 1097042,
+      "p95_ns": 1140458,
+      "p99_ns": 1140458,
+      "per_call_ns": 21940.84,
+      "units_per_second": 91154.213,
+      "max_rss_bytes": 1671168
+    },
+    {
+      "workload": "messaging_replay",
+      "label": "Messaging offline replay",
+      "runtime": "mira_default",
+      "median_ns": 30000,
+      "p95_ns": 34000,
+      "p99_ns": 34000,
+      "per_call_ns": 600.0,
+      "units_per_second": 3333333.333,
+      "max_rss_bytes": 101384192,
+      "classification": "near_parity",
+      "best_foreign_runtime": "go",
+      "best_foreign_median_ns": 31250
+    },
+    {
+      "workload": "analytics_aggregation",
+      "label": "Analytics aggregation request path",
+      "runtime": "go",
+      "median_ns": 64125,
+      "p95_ns": 64833,
+      "p99_ns": 64833,
+      "per_call_ns": 641.25,
+      "units_per_second": 1559454.1910331384,
+      "max_rss_bytes": 4833280
+    },
+    {
+      "workload": "analytics_aggregation",
+      "label": "Analytics aggregation request path",
+      "runtime": "rust",
+      "median_ns": 208416,
+      "p95_ns": 209375,
+      "p99_ns": 209375,
+      "per_call_ns": 2084.16,
+      "units_per_second": 479809.612,
+      "max_rss_bytes": 1605632
+    },
+    {
+      "workload": "analytics_aggregation",
+      "label": "Analytics aggregation request path",
+      "runtime": "mira_default",
+      "median_ns": 60000,
+      "p95_ns": 61000,
+      "p99_ns": 61000,
+      "per_call_ns": 600.0,
+      "units_per_second": 1666666.667,
+      "max_rss_bytes": 100171776,
+      "classification": "ahead",
+      "best_foreign_runtime": "go",
+      "best_foreign_median_ns": 64125
+    },
+    {
+      "workload": "analytics_worker_throughput",
+      "label": "Analytics worker throughput",
+      "runtime": "go",
+      "median_ns": 63507917,
+      "p95_ns": 65192625,
+      "p99_ns": 65192625,
+      "per_call_ns": 1270158.34,
+      "units_per_second": 2361.91024813489,
+      "max_rss_bytes": 4882432
+    },
+    {
+      "workload": "analytics_worker_throughput",
+      "label": "Analytics worker throughput",
+      "runtime": "rust",
+      "median_ns": 82671667,
+      "p95_ns": 82995166,
+      "p99_ns": 82995166,
+      "per_call_ns": 1653433.34,
+      "units_per_second": 1814.406,
+      "max_rss_bytes": 1835008
+    },
+    {
+      "workload": "analytics_worker_throughput",
+      "label": "Analytics worker throughput",
+      "runtime": "mira_default",
+      "median_ns": 33000,
+      "p95_ns": 35000,
+      "p99_ns": 35000,
+      "per_call_ns": 660.0,
+      "units_per_second": 4545454.545,
+      "max_rss_bytes": 99909632,
+      "classification": "ahead",
+      "best_foreign_runtime": "go",
+      "best_foreign_median_ns": 63507917
+    },
+    {
+      "workload": "analytics_failure_recovery",
+      "label": "Analytics failure recovery",
+      "runtime": "go",
+      "median_ns": 27375,
+      "p95_ns": 29167,
+      "p99_ns": 29167,
+      "per_call_ns": 547.5,
+      "units_per_second": 1826484.0182648401,
+      "max_rss_bytes": 4784128
+    },
+    {
+      "workload": "analytics_failure_recovery",
+      "label": "Analytics failure recovery",
+      "runtime": "rust",
+      "median_ns": 1507417,
+      "p95_ns": 1515458,
+      "p99_ns": 1515458,
+      "per_call_ns": 30148.34,
+      "units_per_second": 33169.322,
+      "max_rss_bytes": 1638400
+    },
+    {
+      "workload": "analytics_failure_recovery",
+      "label": "Analytics failure recovery",
+      "runtime": "mira_default",
+      "median_ns": 31000,
+      "p95_ns": 32000,
+      "p99_ns": 32000,
+      "per_call_ns": 620.0,
+      "units_per_second": 1612903.226,
+      "max_rss_bytes": 100614144,
+      "classification": "near_parity",
+      "best_foreign_runtime": "go",
+      "best_foreign_median_ns": 27375
+    }
+  ],
+  "workload_classifications": {
+    "messaging_transport": {
+      "best_foreign_runtime": "go",
+      "best_foreign_median_ns": 419166,
+      "classification": "ahead"
+    },
+    "messaging_fanout": {
+      "best_foreign_runtime": "go",
+      "best_foreign_median_ns": 52042,
+      "classification": "ahead"
+    },
+    "messaging_replay": {
+      "best_foreign_runtime": "go",
+      "best_foreign_median_ns": 31250,
+      "classification": "near_parity"
+    },
+    "analytics_aggregation": {
+      "best_foreign_runtime": "go",
+      "best_foreign_median_ns": 64125,
+      "classification": "ahead"
+    },
+    "analytics_worker_throughput": {
+      "best_foreign_runtime": "go",
+      "best_foreign_median_ns": 63507917,
+      "classification": "ahead"
+    },
+    "analytics_failure_recovery": {
+      "best_foreign_runtime": "go",
+      "best_foreign_median_ns": 27375,
+      "classification": "near_parity"
+    }
+  }
+}

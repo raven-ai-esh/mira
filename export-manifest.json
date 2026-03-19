@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "export_root": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-public-repo",
+  "readme": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-public-repo/README.md",
+  "docs_index": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-public-repo/docs/MIRA_PUBLIC_DOCS_INDEX.md",
+  "artifacts": [
+    "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-public-repo/artifacts/advanced-backend-matrix-2.6.0.json",
+    "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-public-repo/artifacts/advanced-backend-matrix-2.6.0-diagnostics.json",
+    "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-public-repo/artifacts/advanced-backend-release-bundle-2.6.0.json",
+    "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-public-repo/artifacts/messaging-hardening-2.6.0.json",
+    "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-public-repo/artifacts/analytics-hardening-2.6.0.json",
+    "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-public-repo/artifacts/distributed-benchmark-2.4.0.json",
+    "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-public-repo/artifacts/manifest-public-launch-v1.json"
+  ]
+}

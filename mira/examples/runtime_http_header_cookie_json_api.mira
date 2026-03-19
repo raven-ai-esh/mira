@@ -1,0 +1,77 @@
+module runtime.http.header.cookie.json.api@1
+target native
+
+func decode_header_cookie_request
+ret u8
+eff net alloc
+cap net("127.0.0.1:18080")
+spec kind=http constraints=[http,headers,cookies,json_api,response_headers]
+block b0
+  v0:own[buf[u8]] = buf_lit GET\x20/api/profile\x20HTTP/1.1\r\nHost:\x20localhost\r\nX-Mode:\x20fast\r\nCookie:\x20sid=abc123;\x20theme=dark\r\n\r\n
+  v1:view[buf[u8]] = view v0
+  v2:b1 = http_header_eq v1 X-Mode fast
+  branch v2 b1(v0, v1) b4(v0)
+
+block b1(req:own[buf[u8]], req_view:view[buf[u8]])
+  v3:b1 = http_cookie_eq req_view sid abc123
+  branch v3 b2(req) b3(req)
+
+block b2(req:own[buf[u8]])
+  v4:b1 = drop req
+  return 1u8
+
+block b3(req:own[buf[u8]])
+  v5:b1 = drop req
+  return 0u8
+
+block b4(req:own[buf[u8]])
+  v6:b1 = drop req
+  return 0u8
+
+test t0
+  out 1u8
+end
+
+func serve_header_cookie_json_once
+ret u8
+eff net alloc
+cap net("127.0.0.1:39574")
+spec kind=http constraints=[http,headers,cookies,json_api,response_headers,server]
+block b0
+  v0:u64 = net_listen
+  v1:u64 = http_session_accept v0
+  v2:own[buf[u8]] = http_session_request v1
+  v3:view[buf[u8]] = view v2
+  v4:b1 = http_header_eq v3 X-Mode fast
+  branch v4 b1(v0, v1, v2, v3) b4(v0, v1, v2)
+
+block b1(listener:u64, conn:u64, req:own[buf[u8]], req_view:view[buf[u8]])
+  v5:b1 = http_cookie_eq req_view sid abc123
+  branch v5 b2(listener, conn, req) b4(listener, conn, req)
+
+block b2(listener:u64, conn:u64, req:own[buf[u8]])
+  v6:own[buf[u8]] = buf_lit \x7b\x22ok\x22:
+  v7:own[buf[u8]] = buf_lit true\x7d
+  v8:own[buf[u8]] = buf_concat v6 v7
+  v9:b1 = http_session_write_json_headers2 conn 200u32 Cache-Control no-store X-Trace-Id req-42 v8
+  v10:b1 = http_session_close conn
+  v11:b1 = net_close listener
+  v12:b1 = drop v8
+  v13:b1 = drop v7
+  v14:b1 = drop v6
+  v15:b1 = drop req
+  return 1u8
+
+block b4(listener:u64, conn:u64, req:own[buf[u8]])
+  v16:own[buf[u8]] = buf_lit \x7b\x22ok\x22:
+  v17:own[buf[u8]] = buf_lit false\x7d
+  v18:own[buf[u8]] = buf_concat v16 v17
+  v19:b1 = http_session_write_json_headers2 conn 403u32 Cache-Control no-store X-Trace-Id req-42 v18
+  v20:b1 = http_session_close conn
+  v21:b1 = net_close listener
+  v22:b1 = drop v18
+  v23:b1 = drop v17
+  v24:b1 = drop v16
+  v25:b1 = drop req
+  return 0u8
+end

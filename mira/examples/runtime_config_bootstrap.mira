@@ -1,0 +1,197 @@
+module runtime.config.bootstrap@1
+target native
+
+func bootstrap_service_summary
+ret u8
+eff config env alloc
+cap config("service_name=users-api,port=8080,debug=true,boot_date=2026-03-17,boot_time=09:10:11")
+cap env("MIRA_REGION")
+spec kind=service constraints=[config,env,format,json]
+block b0
+  v0:own[str] = config_get_str service_name
+  v2:b1 = str_eq_lit v0 users-api
+  branch v2 b1(v0) b10(v0)
+
+block b1(service:own[str])
+  v3:u32 = config_get_u32 port
+  v4:b1 = eq v3 8080u32
+  branch v4 b2(service, v3) b10(service)
+
+block b2(service:own[str], port:u32)
+  v5:b1 = config_get_bool debug
+  branch v5 b3(service, port, v5) b10(service)
+
+block b3(service:own[str], port:u32, debug:b1)
+  v6:own[str] = config_get_str boot_date
+  v8:u32 = date_parse_ymd v6
+  v9:own[str] = date_format_ymd v8
+  v11:b1 = str_eq_lit v9 2026-03-17
+  branch v11 b4(service, port, debug, v6, v9) b11(service, v6, v9)
+
+block b4(service:own[str], port:u32, debug:b1, boot_date_src:own[str], boot_date_fmt:own[str])
+  v12:own[str] = config_get_str boot_time
+  v14:u32 = time_parse_hms v12
+  v15:own[str] = time_format_hms v14
+  v17:b1 = str_eq_lit v15 09:10:11
+  branch v17 b5(service, port, debug, boot_date_src, boot_date_fmt, v12, v15) b12(service, boot_date_src, boot_date_fmt, v12, v15)
+
+block b5(service:own[str], port:u32, debug:b1, boot_date_src:own[str], boot_date_fmt:own[str], boot_time_src:own[str], boot_time_fmt:own[str])
+  v18:own[str] = env_get_str MIRA_REGION
+  v20:b1 = str_eq_lit v18 eu-central
+  branch v20 b6(service, port, debug, boot_date_src, boot_date_fmt, boot_time_src, boot_time_fmt, v18) b13(service, boot_date_src, boot_date_fmt, boot_time_src, boot_time_fmt, v18)
+
+block b6(service:own[str], port:u32, debug:b1, boot_date_src:own[str], boot_date_fmt:own[str], boot_time_src:own[str], boot_time_fmt:own[str], region:own[str])
+  v21:own[str] = str_lit :
+  v22:own[str] = str_from_u32 port
+  v25:own[str] = str_concat service v21
+  v28:own[str] = str_concat v25 v22
+  v29:own[str] = str_from_bool debug
+  v30:b1 = str_eq_lit v29 true
+  branch v30 b7(service, boot_date_src, boot_date_fmt, boot_time_src, boot_time_fmt, region, v21, v22, v25, v28, v29) b14(service, boot_date_src, boot_date_fmt, boot_time_src, boot_time_fmt, region, v21, v22, v25, v28, v29)
+
+block b7(service:own[str], boot_date_src:own[str], boot_date_fmt:own[str], boot_time_src:own[str], boot_time_fmt:own[str], region:own[str], colon:own[str], port_str:own[str], bind_left:own[str], bind:own[str], debug_text:own[str])
+  v41:own[buf[u8]] = str_to_buf bind
+  v42:own[str] = buf_hex_str v41
+  v44:b1 = str_eq_lit v42 75736572732d6170693a38303830
+  branch v44 b8(service, boot_date_src, boot_date_fmt, boot_time_src, boot_time_fmt, region, colon, port_str, bind_left, bind, debug_text, v41, v42) b15(service, boot_date_src, boot_date_fmt, boot_time_src, boot_time_fmt, region, colon, port_str, bind_left, bind, debug_text, v41, v42)
+
+block b8(service:own[str], boot_date_src:own[str], boot_date_fmt:own[str], boot_time_src:own[str], boot_time_fmt:own[str], region:own[str], colon:own[str], port_str:own[str], bind_left:own[str], bind:own[str], debug_text:own[str], bind_buf:own[buf[u8]], bind_hex:own[str])
+  v45:b1 = drop bind_hex
+  v46:b1 = drop bind_buf
+  v49:b1 = drop debug_text
+  v50:b1 = drop bind
+  v51:b1 = drop bind_left
+  v52:b1 = drop port_str
+  v53:b1 = drop colon
+  v54:b1 = drop region
+  v55:b1 = drop boot_time_fmt
+  v56:b1 = drop boot_time_src
+  v57:b1 = drop boot_date_fmt
+  v58:b1 = drop boot_date_src
+  v59:b1 = drop service
+  return 1u8
+
+block b9(map_src:own[str], name:own[str], list_src:own[str], item:own[str])
+  v60:b1 = drop item
+  v61:b1 = drop list_src
+  v62:b1 = drop name
+  v63:b1 = drop map_src
+  return 1u8
+
+block b10(service:own[str])
+  v64:b1 = drop service
+  return 0u8
+
+block b11(service:own[str], boot_date_src:own[str], boot_date_fmt:own[str])
+  v65:b1 = drop boot_date_fmt
+  v66:b1 = drop boot_date_src
+  v67:b1 = drop service
+  return 0u8
+
+block b12(service:own[str], boot_date_src:own[str], boot_date_fmt:own[str], boot_time_src:own[str], boot_time_fmt:own[str])
+  v68:b1 = drop boot_time_fmt
+  v69:b1 = drop boot_time_src
+  v70:b1 = drop boot_date_fmt
+  v71:b1 = drop boot_date_src
+  v72:b1 = drop service
+  return 0u8
+
+block b13(service:own[str], boot_date_src:own[str], boot_date_fmt:own[str], boot_time_src:own[str], boot_time_fmt:own[str], region:own[str])
+  v73:b1 = drop region
+  v74:b1 = drop boot_time_fmt
+  v75:b1 = drop boot_time_src
+  v76:b1 = drop boot_date_fmt
+  v77:b1 = drop boot_date_src
+  v78:b1 = drop service
+  return 0u8
+
+block b14(service:own[str], boot_date_src:own[str], boot_date_fmt:own[str], boot_time_src:own[str], boot_time_fmt:own[str], region:own[str], colon:own[str], port_str:own[str], bind_left:own[str], bind:own[str], debug_text:own[str])
+  v81:b1 = drop debug_text
+  v82:b1 = drop bind
+  v83:b1 = drop bind_left
+  v84:b1 = drop port_str
+  v85:b1 = drop colon
+  v86:b1 = drop region
+  v87:b1 = drop boot_time_fmt
+  v88:b1 = drop boot_time_src
+  v89:b1 = drop boot_date_fmt
+  v90:b1 = drop boot_date_src
+  v91:b1 = drop service
+  return 0u8
+
+block b15(service:own[str], boot_date_src:own[str], boot_date_fmt:own[str], boot_time_src:own[str], boot_time_fmt:own[str], region:own[str], colon:own[str], port_str:own[str], bind_left:own[str], bind:own[str], debug_text:own[str], bind_buf:own[buf[u8]], bind_hex:own[str])
+  v92:b1 = drop bind_hex
+  v93:b1 = drop bind_buf
+  v96:b1 = drop debug_text
+  v97:b1 = drop bind
+  v98:b1 = drop bind_left
+  v99:b1 = drop port_str
+  v100:b1 = drop colon
+  v101:b1 = drop region
+  v102:b1 = drop boot_time_fmt
+  v103:b1 = drop boot_time_src
+  v104:b1 = drop boot_date_fmt
+  v105:b1 = drop boot_date_src
+  v106:b1 = drop service
+  return 0u8
+
+test t0
+  out 1u8
+end
+
+func strmap_and_strlist_helpers
+ret u8
+eff alloc
+spec kind=stdlib constraints=[strmap,strlist,json]
+block b0
+  v0:own[buf[u8]] = buf_lit \x7b\x22count\x22:3,\x22enabled\x22:true,\x22name\x22:\x22api\x22\x7d
+  v1:own[str] = buf_to_str v0
+  v2:b1 = drop v0
+  v4:u32 = strmap_get_u32 v1 count
+  v5:b1 = strmap_get_bool v1 enabled
+  v6:own[str] = strmap_get_str v1 name
+  v8:b1 = str_eq_lit v6 api
+  branch v8 b1(v1, v6, v4, v5) b3(v1, v6)
+
+block b1(map_src:own[str], name:own[str], count:u32, enabled:b1)
+  v9:b1 = eq count 3u32
+  branch v9 b2(map_src, name, enabled) b3(map_src, name)
+
+block b2(map_src:own[str], name:own[str], enabled:b1)
+  branch enabled b4(map_src, name) b3(map_src, name)
+
+block b3(map_src:own[str], name:own[str])
+  v10:b1 = drop name
+  v11:b1 = drop map_src
+  return 0u8
+
+block b4(map_src:own[str], name:own[str])
+  v12:own[buf[u8]] = buf_lit \x5b\x22red\x22,\x22blue\x22,\x22green\x22\x5d
+  v13:own[str] = buf_to_str v12
+  v14:b1 = drop v12
+  v16:u32 = strlist_len v13
+  v17:own[str] = strlist_index_str v13 1u32
+  v19:b1 = str_eq_lit v17 blue
+  branch v19 b5(map_src, name, v13, v17, v16) b6(map_src, name, v13, v17)
+
+block b5(map_src:own[str], name:own[str], list_src:own[str], item:own[str], list_len:u32)
+  v20:b1 = eq list_len 3u32
+  branch v20 b7(map_src, name, list_src, item) b6(map_src, name, list_src, item)
+
+block b6(map_src:own[str], name:own[str], list_src:own[str], item:own[str])
+  v21:b1 = drop item
+  v22:b1 = drop list_src
+  v23:b1 = drop name
+  v24:b1 = drop map_src
+  return 0u8
+
+block b7(map_src:own[str], name:own[str], list_src:own[str], item:own[str])
+  v25:b1 = drop item
+  v26:b1 = drop list_src
+  v27:b1 = drop name
+  v28:b1 = drop map_src
+  return 1u8
+
+test t0
+  out 1u8
+end

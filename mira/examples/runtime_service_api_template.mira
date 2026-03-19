@@ -1,0 +1,67 @@
+module runtime.service.api.template@1
+target native
+
+func service_entry_status
+ret u32
+eff service db alloc
+cap service("inventory-api")
+cap db("tmp/mira-tests/inventory-api.db")
+spec kind=service constraints=[bootstrap,router,middleware,health,readiness,migration]
+block b0
+  v0:u64 = service_open
+  v1:own[buf[u8]] = buf_lit booting
+  v2:b1 = service_log v0 info v1
+  v3:u64 = db_open tmp/mira-tests/inventory-api.db
+  v4:b1 = service_migrate_db v0 v3 bootstrap
+  v5:u32 = service_readiness_status v0
+  v6:b1 = eq v5 200u32
+  branch v6 b1(v0, v1, v3) b8(v0, v1, v3)
+
+block b1(service:u64, boot_msg:own[buf[u8]], dbh:u64)
+  v7:own[buf[u8]] = buf_lit GET\x20/items/42\x20HTTP/1.1\r\nHost:\x20localhost\r\nAuthorization:\x20token-42\r\n\r\n
+  v8:view[buf[u8]] = view v7
+  v9:b1 = service_route v8 GET /items/42
+  branch v9 b2(service, boot_msg, dbh, v7, v8) b9(service, boot_msg, dbh, v7)
+
+block b2(service:u64, boot_msg:own[buf[u8]], dbh:u64, req:own[buf[u8]], req_view:view[buf[u8]])
+  v10:b1 = service_require_header req_view Authorization token-42
+  branch v10 b3(service, boot_msg, dbh, req) b10(service, boot_msg, dbh, req)
+
+block b3(service:u64, boot_msg:own[buf[u8]], dbh:u64, req:own[buf[u8]])
+  v11:u64 = service_trace_begin service request
+  v12:b1 = service_metric_count service request_total 1u32
+  v13:u32 = service_health_status service
+  v14:b1 = service_trace_end v11
+  v15:b1 = db_close dbh
+  v16:b1 = service_shutdown service 5u32
+  v17:b1 = service_close service
+  v18:b1 = drop req
+  v19:b1 = drop boot_msg
+  return v13
+
+block b8(service:u64, boot_msg:own[buf[u8]], dbh:u64)
+  v20:u32 = service_error_status service_unavailable
+  v21:b1 = db_close dbh
+  v22:b1 = service_close service
+  v23:b1 = drop boot_msg
+  return v20
+
+block b9(service:u64, boot_msg:own[buf[u8]], dbh:u64, req:own[buf[u8]])
+  v24:u32 = service_error_status not_found
+  v25:b1 = db_close dbh
+  v26:b1 = service_close service
+  v27:b1 = drop req
+  v28:b1 = drop boot_msg
+  return v24
+
+block b10(service:u64, boot_msg:own[buf[u8]], dbh:u64, req:own[buf[u8]])
+  v29:u32 = service_error_status unauthorized
+  v30:b1 = db_close dbh
+  v31:b1 = service_close service
+  v32:b1 = drop req
+  v33:b1 = drop boot_msg
+  return v29
+
+test t0
+  out 200u32
+end

@@ -1,0 +1,110 @@
+module runtime.advanced.analytics.benchmark@1
+target native
+
+func analytics_aggregation_bench
+ret u32
+eff service net alloc
+cap service("advanced-analytics-aggregation")
+cap net("127.0.0.1:39582")
+spec kind=service constraints=[analytics,aggregation,portable_native]
+block b0
+  v0:u64 = service_open
+  v2:own[buf[u8]] = buf_lit POST\x20/aggregate\x20HTTP/1.1\r\nHost:\x20localhost\r\nContent-Type:\x20application/json\r\n\r\n{\x22delta\x22:42}
+  v3:b1 = service_route v2 POST /aggregate
+  v4:own[buf[u8]] = http_body v2
+  v5:u32 = json_get_u32 v4 delta
+  v6:b1 = eq v5 42u32
+  branch v3 b1(v0, v2, v4, v5, v6) b4(v0, v2, v4)
+
+block b1(svc:u64, req:own[buf[u8]], body:own[buf[u8]], value:u32, value_ok:b1)
+  branch value_ok b3(svc, req, body, value) b4(svc, req, body)
+
+block b3(svc:u64, req:own[buf[u8]], body:own[buf[u8]], value:u32)
+  v7:u32 = service_health_status svc
+  v8:u32 = add value v7
+  v9:b1 = service_close svc
+  v10:b1 = drop body
+  v11:b1 = drop req
+  return v8
+
+block b4(svc:u64, req:own[buf[u8]], body:own[buf[u8]])
+  v12:b1 = service_close svc
+  v13:b1 = drop body
+  v14:b1 = drop req
+  return 0u32
+
+test t0
+  out 242u32
+end
+
+func analytics_worker_throughput_bench
+ret u32
+eff service net alloc
+cap service("advanced-analytics-worker")
+cap net("127.0.0.1:39582")
+spec kind=service constraints=[analytics,worker_queue,portable_native]
+block b0
+  v0:u64 = service_open
+  v1:own[buf[u8]] = buf_lit POST\x20/worker\x20HTTP/1.1\r\nHost:\x20localhost\r\nContent-Type:\x20application/json\r\n\r\n{\x22jobs\x22:3}
+  v2:b1 = service_route v1 POST /worker
+  v3:own[buf[u8]] = http_body v1
+  v4:u32 = json_get_u32 v3 jobs
+  v5:b1 = eq v4 3u32
+  branch v2 b1(v0, v1, v3, v4, v5) b4(v0, v1, v3)
+
+block b1(svc:u64, req:own[buf[u8]], body:own[buf[u8]], jobs:u32, jobs_ok:b1)
+  branch jobs_ok b2(svc, req, body, jobs) b4(svc, req, body)
+
+block b2(svc:u64, req:own[buf[u8]], body:own[buf[u8]], jobs:u32)
+  v6:u32 = service_health_status svc
+  v7:u32 = add v6 jobs
+  v8:b1 = service_close svc
+  v9:b1 = drop body
+  v10:b1 = drop req
+  return v7
+
+block b4(svc:u64, req:own[buf[u8]], body:own[buf[u8]])
+  v11:b1 = service_close svc
+  v12:b1 = drop body
+  v13:b1 = drop req
+  return 0u32
+
+test t1
+  out 203u32
+end
+
+func analytics_failure_recovery_bench
+ret u32
+eff service net alloc
+cap service("advanced-analytics-recovery")
+cap net("127.0.0.1:39582")
+spec kind=service constraints=[analytics,recovery,checkpoint,portable_native]
+block b0
+  v0:u64 = service_open
+  v2:own[buf[u8]] = buf_lit POST\x20/recover\x20HTTP/1.1\r\nHost:\x20localhost\r\nContent-Type:\x20application/json\r\n\r\n{\x22status\x22:200}
+  v3:b1 = service_route v2 POST /recover
+  v4:own[buf[u8]] = http_body v2
+  v5:u32 = json_get_u32 v4 status
+  v6:b1 = eq v5 200u32
+  branch v3 b1(v0, v2, v4, v5, v6) b4(v0, v2, v4)
+
+block b1(svc:u64, req:own[buf[u8]], body:own[buf[u8]], status:u32, status_ok:b1)
+  branch status_ok b3(svc, req, body, status) b4(svc, req, body)
+
+block b3(svc:u64, req:own[buf[u8]], body:own[buf[u8]], status:u32)
+  v7:u32 = service_health_status svc
+  v8:u32 = add status v7
+  v9:b1 = service_close svc
+  v10:b1 = drop body
+  v11:b1 = drop req
+  return v8
+
+block b4(svc:u64, req:own[buf[u8]], body:own[buf[u8]])
+  v12:b1 = service_close svc
+  v13:b1 = drop body
+  v14:b1 = drop req
+  return 0u32
+
+test t2
+  out 400u32
+end

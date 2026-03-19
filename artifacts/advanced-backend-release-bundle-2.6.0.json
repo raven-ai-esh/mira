@@ -1,0 +1,18 @@
+{
+  "release": "2.6.0",
+  "advanced_generation_contract_artifact": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/advanced-generation-contract-2.6.0.json",
+  "benchmark_matrix_json": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/advanced-backend-matrix-2.6.0.json",
+  "benchmark_matrix_md": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/advanced-backend-matrix-2.6.0.md",
+  "benchmark_diagnostics_json": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/advanced-backend-matrix-2.6.0-diagnostics.json",
+  "operational_hardening_artifacts": {
+    "messaging_conformance_json": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-hardening-2.6.0.json",
+    "messaging_regression_json": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-hardening-regression-2.6.0.json",
+    "analytics_conformance_json": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-hardening-2.6.0.json",
+    "analytics_regression_json": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-hardening-regression-2.6.0.json"
+  },
+  "portable_native_supremacy_baseline": {
+    "matrix_json": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/portable-native-supremacy-2.5.0.json",
+    "matrix_md": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/portable-native-supremacy-2.5.0.md",
+    "diagnostics_json": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/portable-native-supremacy-2.5.0-diagnostics.json"
+  }
+}

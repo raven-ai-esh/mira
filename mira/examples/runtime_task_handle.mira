@@ -1,0 +1,37 @@
+module runtime.task.handle@1
+target native
+
+func poll_sleep_task
+ret b1
+eff spawn
+cap spawn("/bin/sleep")
+spec kind=task constraints=[spawn,handle,done]
+block b0
+  v0:u64 = task_open /bin/sleep 1
+  v1:b1 = task_done v0
+  v2:i32 = task_join v0
+  v3:b1 = task_close v0
+  return v1
+
+test t0
+  out false
+end
+
+func capture_echo_task_stdout
+ret u8
+eff spawn alloc
+cap spawn("/bin/echo")
+spec kind=task constraints=[spawn,join,stdout,bytes]
+block b0
+  v0:u64 = task_open /bin/echo HI
+  v1:i32 = task_join v0
+  v2:own[buf[u8]] = task_stdout_all v0
+  v3:view[buf[u8]] = view v2
+  v4:u8 = load v3 0u32
+  v5:b1 = task_close v0
+  v6:b1 = drop v2
+  return v4
+
+test t0
+  out 72u8
+end

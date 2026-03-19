@@ -1,0 +1,86 @@
+{
+  "release": "2.4.0",
+  "generated_at": "2026-03-19T03:07:17Z",
+  "selected_backend": "mira_c",
+  "selection_rationale": "Distributed 2.4.0 benchmark artifact is anchored on `mira_c` while the promoted emitted/default backend has not yet been extended to the full distributed coordination surface.",
+  "workloads": [
+    {
+      "name": "shard_messaging_edge",
+      "source": "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_shard_messaging_edge.mira",
+      "function": "shard_edge_route",
+      "iterations": 30,
+      "unit_work": 1,
+      "backend": "mira_c",
+      "result": {
+        "case": "shard_edge_route",
+        "file": "/var/folders/10/p8t7kwqd5wb8v03pm2s81ygr0000gn/T/shard_messaging_edge_mrnzgb7d/runtime_shard_messaging_edge.mira",
+        "iterations": 30,
+        "unit_work": 1,
+        "samples_ns": [
+          4717000,
+          4643000,
+          5222000,
+          6810000,
+          8225000
+        ],
+        "median_ns": 5222000,
+        "p95_ns": 6810000,
+        "p99_ns": 6810000,
+        "per_call_ns": 174066.667,
+        "units_per_second": 5744.925
+      }
+    },
+    {
+      "name": "distributed_analytics_cluster",
+      "source": "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_distributed_analytics_cluster.mira",
+      "function": "replay_cluster_checkpoint",
+      "iterations": 20,
+      "unit_work": 2,
+      "backend": "mira_c",
+      "result": {
+        "case": "replay_cluster_checkpoint",
+        "file": "/var/folders/10/p8t7kwqd5wb8v03pm2s81ygr0000gn/T/distributed_analytics_cluster_85who9l9/runtime_distributed_analytics_cluster.mira",
+        "iterations": 20,
+        "unit_work": 2,
+        "samples_ns": [
+          11219000,
+          11185000,
+          11908000,
+          11262000,
+          12541000
+        ],
+        "median_ns": 11262000,
+        "p95_ns": 11908000,
+        "p99_ns": 11908000,
+        "per_call_ns": 563100.0,
+        "units_per_second": 3551.767
+      }
+    },
+    {
+      "name": "failover_rebalance_service",
+      "source": "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_failover_rebalance_service.mira",
+      "function": "rebalance_without_duplicate_work",
+      "iterations": 20,
+      "unit_work": 2,
+      "backend": "mira_c",
+      "result": {
+        "case": "rebalance_without_duplicate_work",
+        "file": "/var/folders/10/p8t7kwqd5wb8v03pm2s81ygr0000gn/T/failover_rebalance_service__7fc89ia/runtime_failover_rebalance_service.mira",
+        "iterations": 20,
+        "unit_work": 2,
+        "samples_ns": [
+          12377000,
+          11560000,
+          11057000,
+          11610000,
+          12335000
+        ],
+        "median_ns": 11610000,
+        "p95_ns": 12335000,
+        "p99_ns": 12335000,
+        "per_call_ns": 580500.0,
+        "units_per_second": 3445.306
+      }
+    }
+  ]
+}

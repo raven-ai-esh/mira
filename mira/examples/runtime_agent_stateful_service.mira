@@ -1,0 +1,46 @@
+module runtime.agent.stateful.service@1
+target native
+
+func maintained_agent_stateful_status
+ret u32
+eff service fs.read fs.write net alloc
+cap service("agent-platform-stateful")
+cap fs("agent-platform.counter")
+cap net("127.0.0.1:39582")
+spec kind=service constraints=[agent_platform,maintained,stateful,fs,portable_native]
+block b0
+  v0:u64 = service_open
+  v1:b1 = fs_write_u32 7u32
+  v2:own[buf[u8]] = buf_lit POST\x20/counter\x20HTTP/1.1\r\nHost:\x20localhost\r\nContent-Type:\x20application/json\r\n\r\n{\x22delta\x22:42}
+  v3:b1 = service_route v2 POST /counter
+  v4:own[buf[u8]] = http_body v2
+  v5:u32 = json_get_u32 v4 delta
+  v6:u32 = fs_read_u32
+  v7:b1 = eq v5 42u32
+  v8:b1 = eq v6 7u32
+  branch v3 b1(v0, v2, v4, v7, v8, v5, v6) b4(v0, v2, v4)
+
+block b1(svc:u64, req:own[buf[u8]], body:own[buf[u8]], json_ok:b1, state_ok:b1, delta:u32, qty:u32)
+  branch json_ok b2(svc, req, body, state_ok, delta, qty) b4(svc, req, body)
+
+block b2(svc:u64, req:own[buf[u8]], body:own[buf[u8]], state_ok:b1, delta:u32, qty:u32)
+  branch state_ok b3(svc, req, body, delta, qty) b4(svc, req, body)
+
+block b3(svc:u64, req:own[buf[u8]], body:own[buf[u8]], delta:u32, qty:u32)
+  v9:u32 = add delta qty
+  v10:u32 = service_health_status svc
+  v11:u32 = add v9 v10
+  v12:b1 = service_close svc
+  v13:b1 = drop body
+  v14:b1 = drop req
+  return v11
+
+block b4(svc:u64, req:own[buf[u8]], body:own[buf[u8]])
+  v15:b1 = service_close svc
+  v16:b1 = drop body
+  v17:b1 = drop req
+  return 0u32
+
+test t0
+  out 249u32
+end

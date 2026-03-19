@@ -1,0 +1,44 @@
+module runtime.http.server.handle@1
+target native
+
+func serve_health_once
+ret u8
+eff net alloc
+cap net("127.0.0.1:38531")
+spec kind=http constraints=[http,server,router,handle,bytes]
+block b0
+  v0:u64 = net_listen
+  v1:u64 = net_accept v0
+  v2:own[buf[u8]] = net_read_all v1
+  v3:view[buf[u8]] = view v2
+  v4:b1 = http_method_eq v3 GET
+  branch v4 b1(v0, v1, v2, v3) b4(v0, v1, v2)
+
+block b1(listener:u64, conn:u64, req:own[buf[u8]], req_view:view[buf[u8]])
+  v5:b1 = http_path_eq req_view /health
+  branch v5 b2(listener, conn, req) b4(listener, conn, req)
+
+block b2(listener:u64, conn:u64, req:own[buf[u8]])
+  v6:own[buf[u8]] = alloc heap 2u32
+  v7:edit[buf[u8]] = edit v6
+  v8:edit[buf[u8]] = store v7 0u32 79u8
+  v9:edit[buf[u8]] = store v8 1u32 75u8
+  v10:b1 = http_write_response conn 200u32 v9
+  v11:b1 = net_close conn
+  v12:b1 = net_close listener
+  v13:b1 = drop v6
+  v14:b1 = drop req
+  return 1u8
+
+block b4(listener:u64, conn:u64, req:own[buf[u8]])
+  v15:own[buf[u8]] = alloc heap 2u32
+  v16:edit[buf[u8]] = edit v15
+  v17:edit[buf[u8]] = store v16 0u32 78u8
+  v18:edit[buf[u8]] = store v17 1u32 79u8
+  v19:b1 = http_write_response conn 404u32 v18
+  v20:b1 = net_close conn
+  v21:b1 = net_close listener
+  v22:b1 = drop v15
+  v23:b1 = drop req
+  return 0u8
+end

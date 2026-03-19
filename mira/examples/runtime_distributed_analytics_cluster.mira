@@ -1,0 +1,179 @@
+module runtime.distributed.analytics.cluster@1
+target native
+
+func replay_cluster_checkpoint
+ret u8
+eff alloc queue service fs.write
+cap queue("/tmp/mira_2_4_analytics.stream")
+cap service("distributed-analytics")
+cap fs("/tmp/mira_2_4_analytics.stream")
+spec kind=worker constraints=[distributed,analytics,checkpoint,replay]
+block b0
+  v0:own[buf[u8]] = alloc arena 0u32
+  v1:view[buf[u8]] = view v0
+  v2:b1 = fs_write_all v1
+  v3:b1 = drop v0
+  v4:u64 = service_open
+  v5:u64 = placement_open /tmp/mira_2_4_analytics.place
+  v6:u64 = lease_open /tmp/mira_2_4_analytics.lease
+  v7:u64 = coord_open /tmp/mira_2_4_analytics.coord
+  v8:u64 = stream_open /tmp/mira_2_4_analytics.stream
+  v9:u64 = agg_open_u64
+  v10:b1 = lease_release v6 2u32
+  v11:b1 = lease_release v6 3u32
+  v12:own[buf[u8]] = buf_lit 11
+  v13:own[buf[u8]] = buf_lit 13
+  v14:u32 = shard_route_u32 v12 2u32
+  v15:b1 = placement_assign v5 v14 2u32
+  branch v15 b1(v4, v5, v6, v7, v8, v9, v12, v13, v14) b14(v4, v5, v6, v7, v8, v9, v12, v13)
+
+block b1(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], shard:u32)
+  v16:u32 = placement_lookup place shard
+  v17:b1 = eq v16 2u32
+  branch v17 b2(service, place, lease, coord, streamh, aggh, seed_a, seed_b) b14(service, place, lease, coord, streamh, aggh, seed_a, seed_b)
+
+block b2(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]])
+  v18:b1 = lease_acquire lease 2u32
+  branch v18 b3(service, place, lease, coord, streamh, aggh, seed_a, seed_b) b14(service, place, lease, coord, streamh, aggh, seed_a, seed_b)
+
+block b3(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]])
+  v19:b1 = coord_store_u32 coord checkpoint 0u32
+  branch v19 b4(service, place, lease, coord, streamh, aggh, seed_a, seed_b) b14(service, place, lease, coord, streamh, aggh, seed_a, seed_b)
+
+block b4(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]])
+  v20:u32 = stream_publish_buf streamh seed_a
+  v21:u32 = stream_publish_buf streamh seed_b
+  v22:b1 = eq v20 1u32
+  branch v22 b5(service, place, lease, coord, streamh, aggh, seed_a, seed_b, v21) b14(service, place, lease, coord, streamh, aggh, seed_a, seed_b)
+
+block b5(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], seq_b:u32)
+  v23:b1 = eq seq_b 2u32
+  branch v23 b6(service, place, lease, coord, streamh, aggh, seed_a, seed_b) b14(service, place, lease, coord, streamh, aggh, seed_a, seed_b)
+
+block b6(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]])
+  v24:u32 = coord_load_u32 coord checkpoint
+  v25:u32 = add v24 1u32
+  v26:u64 = stream_replay_open streamh v25
+  v27:own[buf[u8]] = stream_replay_next v26
+  v28:u32 = buf_parse_u32 v27
+  v29:b1 = agg_add_u64 aggh 11u64
+  v30:u32 = stream_replay_offset v26
+  v31:b1 = coord_store_u32 coord checkpoint v30
+  v32:b1 = stream_replay_close v26
+  branch v29 b7(service, place, lease, coord, streamh, aggh, seed_a, seed_b, v27, v28, v30, v31, v32) b15(service, place, lease, coord, streamh, aggh, seed_a, seed_b, v27)
+
+block b7(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]], parsed_a:u32, checkpoint_a:u32, save_a:b1, close_a:b1)
+  v33:b1 = eq parsed_a 11u32
+  branch v33 b8(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, checkpoint_a, save_a, close_a) b15(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a)
+
+block b8(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]], checkpoint_a:u32, save_a:b1, close_a:b1)
+  v34:b1 = eq checkpoint_a 1u32
+  branch v34 b9(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, save_a, close_a) b15(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a)
+
+block b9(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]], save_a:b1, close_a:b1)
+  branch save_a b10(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, close_a) b15(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a)
+
+block b10(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]], close_a:b1)
+  branch close_a b11(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a) b15(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a)
+
+block b11(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]])
+  v35:b1 = lease_release lease 2u32
+  branch v35 b12(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a) b15(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a)
+
+block b12(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]])
+  v36:b1 = lease_acquire lease 3u32
+  branch v36 b13(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a) b15(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a)
+
+block b13(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]])
+  v37:u32 = coord_load_u32 coord checkpoint
+  v38:u32 = add v37 1u32
+  v39:u64 = stream_replay_open streamh v38
+  v40:own[buf[u8]] = stream_replay_next v39
+  v41:u32 = buf_parse_u32 v40
+  v42:b1 = agg_add_u64 aggh 13u64
+  v43:u32 = stream_replay_offset v39
+  v44:b1 = coord_store_u32 coord checkpoint v43
+  v45:b1 = stream_replay_close v39
+  v46:u64 = agg_sum_u64 aggh
+  v47:b1 = eq v41 13u32
+  branch v47 b16(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, v40, v42, v43, v44, v45, v46) b17(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, v40)
+
+block b14(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]])
+  v48:b1 = agg_close aggh
+  v49:b1 = stream_close streamh
+  v50:b1 = coord_close coord
+  v51:b1 = lease_close lease
+  v52:b1 = placement_close place
+  v53:b1 = service_close service
+  v54:b1 = drop seed_b
+  v55:b1 = drop seed_a
+  return 0u8
+
+block b15(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]])
+  v56:b1 = agg_close aggh
+  v57:b1 = stream_close streamh
+  v58:b1 = coord_close coord
+  v59:b1 = lease_close lease
+  v60:b1 = placement_close place
+  v61:b1 = service_close service
+  v62:b1 = drop replay_a
+  v63:b1 = drop seed_b
+  v64:b1 = drop seed_a
+  return 0u8
+
+block b16(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]], replay_b:own[buf[u8]], agg_ok:b1, checkpoint_b:u32, save_b:b1, close_b:b1, sum:u64)
+  branch agg_ok b18(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, replay_b, checkpoint_b, save_b, close_b, sum) b17(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, replay_b)
+
+block b17(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]], replay_b:own[buf[u8]])
+  v65:b1 = agg_close aggh
+  v66:b1 = stream_close streamh
+  v67:b1 = coord_close coord
+  v68:b1 = lease_close lease
+  v69:b1 = placement_close place
+  v70:b1 = service_close service
+  v71:b1 = drop replay_b
+  v72:b1 = drop replay_a
+  v73:b1 = drop seed_b
+  v74:b1 = drop seed_a
+  return 0u8
+
+block b18(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]], replay_b:own[buf[u8]], checkpoint_b:u32, save_b:b1, close_b:b1, sum:u64)
+  v75:b1 = eq checkpoint_b 2u32
+  branch v75 b19(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, replay_b, save_b, close_b, sum) b17(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, replay_b)
+
+block b19(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]], replay_b:own[buf[u8]], save_b:b1, close_b:b1, sum:u64)
+  branch save_b b20(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, replay_b, close_b, sum) b17(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, replay_b)
+
+block b20(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]], replay_b:own[buf[u8]], close_b:b1, sum:u64)
+  branch close_b b21(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, replay_b, sum) b17(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, replay_b)
+
+block b21(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]], replay_b:own[buf[u8]], sum:u64)
+  v76:b1 = eq sum 24u64
+  branch v76 b22(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, replay_b) b17(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, replay_b)
+
+block b22(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]], replay_b:own[buf[u8]])
+  v77:b1 = service_metric_count_dim service processed worker 2u32
+  v78:u32 = service_metric_total service processed
+  v79:b1 = eq v78 2u32
+  branch v79 b23(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, replay_b) b17(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, replay_b)
+
+block b23(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]], replay_b:own[buf[u8]])
+  v80:b1 = lease_release lease 3u32
+  branch v80 b24(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, replay_b) b17(service, place, lease, coord, streamh, aggh, seed_a, seed_b, replay_a, replay_b)
+
+block b24(service:u64, place:u64, lease:u64, coord:u64, streamh:u64, aggh:u64, seed_a:own[buf[u8]], seed_b:own[buf[u8]], replay_a:own[buf[u8]], replay_b:own[buf[u8]])
+  v81:b1 = agg_close aggh
+  v82:b1 = stream_close streamh
+  v83:b1 = coord_close coord
+  v84:b1 = lease_close lease
+  v85:b1 = placement_close place
+  v86:b1 = service_close service
+  v87:b1 = drop replay_b
+  v88:b1 = drop replay_a
+  v89:b1 = drop seed_b
+  v90:b1 = drop seed_a
+  return 1u8
+
+test t0
+  out 1u8
+end

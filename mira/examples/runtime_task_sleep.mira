@@ -1,0 +1,21 @@
+module runtime.task.sleep@1
+target native
+
+func sleep_briefly
+ret u8
+eff clock
+cap clock("monotonic")
+spec kind=runtime constraints=[sleep,clock]
+block b0
+  v0:b1 = task_sleep_ms 1u32
+  branch v0 b1() b2()
+
+block b1
+  return 1u8
+
+block b2
+  return 0u8
+
+test t0
+  out 1u8
+end

@@ -1,0 +1,122 @@
+module runtime.direct.message.service@1
+target native
+
+func direct_message_service_status
+ret u8
+eff alloc net
+cap net("127.0.0.1:1")
+spec kind=message constraints=[direct,ordering,ack,retry,dedup]
+block b0
+  v0:u64 = msg_log_open
+  v1:own[buf[u8]] = buf_lit dm1
+  v2:own[buf[u8]] = buf_lit dm2
+  v3:own[buf[u8]] = buf_lit key1
+  v4:u32 = msg_send_dedup v0 conv_dm alice v3 v1
+  v5:u32 = msg_send_dedup v0 conv_dm alice v3 v1
+  v6:u32 = msg_send v0 conv_dm alice v2
+  v7:b1 = eq v4 1u32
+  branch v7 b1(v0, v1, v2, v3, v5, v6) b16(v0, v1, v2, v3)
+
+block b1(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]], dedup_seq:u32, second_seq:u32)
+  v8:b1 = eq dedup_seq 1u32
+  branch v8 b2(log, first_msg, second_msg, dedup_key, second_seq) b16(log, first_msg, second_msg, dedup_key)
+
+block b2(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]], second_seq:u32)
+  v9:b1 = eq second_seq 2u32
+  branch v9 b4(log, first_msg, second_msg, dedup_key) b16(log, first_msg, second_msg, dedup_key)
+
+block b3(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]])
+  v10:u32 = msg_failure_class log
+  v11:b1 = eq v10 3u32
+  branch v11 b4(log, first_msg, second_msg, dedup_key) b16(log, first_msg, second_msg, dedup_key)
+
+block b4(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]])
+  v12:u32 = msg_recv_seq log alice
+  v13:b1 = eq v12 1u32
+  branch v13 b5(log, first_msg, second_msg, dedup_key) b16(log, first_msg, second_msg, dedup_key)
+
+block b5(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]])
+  v14:own[buf[u8]] = msg_recv_next log alice
+  v15:view[buf[u8]] = view v14
+  v16:b1 = buf_eq_lit v15 dm1
+  branch v16 b6(log, first_msg, second_msg, dedup_key, v14) b17(log, first_msg, second_msg, dedup_key, v14)
+
+block b6(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]], recv1:own[buf[u8]])
+  v17:b1 = msg_ack log alice 1u32
+  branch v17 b7(log, first_msg, second_msg, dedup_key, recv1) b17(log, first_msg, second_msg, dedup_key, recv1)
+
+block b7(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]], recv1:own[buf[u8]])
+  v18:b1 = msg_mark_retry log alice 2u32
+  branch v18 b9(log, first_msg, second_msg, dedup_key, recv1) b17(log, first_msg, second_msg, dedup_key, recv1)
+
+block b8(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]], recv1:own[buf[u8]])
+  v19:u32 = msg_retry_count log alice 2u32
+  v20:b1 = eq v19 1u32
+  branch v20 b9(log, first_msg, second_msg, dedup_key, recv1) b17(log, first_msg, second_msg, dedup_key, recv1)
+
+block b9(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]], recv1:own[buf[u8]])
+  v21:u32 = msg_recv_seq log alice
+  v22:b1 = eq v21 2u32
+  branch v22 b10(log, first_msg, second_msg, dedup_key, recv1) b17(log, first_msg, second_msg, dedup_key, recv1)
+
+block b10(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]], recv1:own[buf[u8]])
+  v23:own[buf[u8]] = msg_recv_next log alice
+  v24:view[buf[u8]] = view v23
+  v25:b1 = buf_eq_lit v24 dm2
+  branch v25 b11(log, first_msg, second_msg, dedup_key, recv1, v23) b18(log, first_msg, second_msg, dedup_key, recv1, v23)
+
+block b11(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]], recv1:own[buf[u8]], recv2:own[buf[u8]])
+  v26:u32 = msg_pending_count log alice
+  v27:b1 = eq v26 1u32
+  branch v27 b12(log, first_msg, second_msg, dedup_key, recv1, recv2) b18(log, first_msg, second_msg, dedup_key, recv1, recv2)
+
+block b12(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]], recv1:own[buf[u8]], recv2:own[buf[u8]])
+  v28:u32 = msg_delivery_total log alice
+  v29:b1 = eq v28 2u32
+  branch v29 b13(log, first_msg, second_msg, dedup_key, recv1, recv2) b18(log, first_msg, second_msg, dedup_key, recv1, recv2)
+
+block b13(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]], recv1:own[buf[u8]], recv2:own[buf[u8]])
+  v30:b1 = msg_ack log alice 2u32
+  branch v30 b14(log, first_msg, second_msg, dedup_key, recv1, recv2) b18(log, first_msg, second_msg, dedup_key, recv1, recv2)
+
+block b14(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]], recv1:own[buf[u8]], recv2:own[buf[u8]])
+  v31:u32 = msg_pending_count log alice
+  v32:b1 = eq v31 0u32
+  branch v32 b15(log, first_msg, second_msg, dedup_key, recv1, recv2) b18(log, first_msg, second_msg, dedup_key, recv1, recv2)
+
+block b15(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]], recv1:own[buf[u8]], recv2:own[buf[u8]])
+  v33:b1 = msg_log_close log
+  v34:b1 = drop recv2
+  v35:b1 = drop recv1
+  v36:b1 = drop dedup_key
+  v37:b1 = drop second_msg
+  v38:b1 = drop first_msg
+  return 1u8
+
+block b16(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]])
+  v39:b1 = msg_log_close log
+  v40:b1 = drop dedup_key
+  v41:b1 = drop second_msg
+  v42:b1 = drop first_msg
+  return 0u8
+
+block b17(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]], recv1:own[buf[u8]])
+  v43:b1 = msg_log_close log
+  v44:b1 = drop recv1
+  v45:b1 = drop dedup_key
+  v46:b1 = drop second_msg
+  v47:b1 = drop first_msg
+  return 0u8
+
+block b18(log:u64, first_msg:own[buf[u8]], second_msg:own[buf[u8]], dedup_key:own[buf[u8]], recv1:own[buf[u8]], recv2:own[buf[u8]])
+  v48:b1 = msg_log_close log
+  v49:b1 = drop recv2
+  v50:b1 = drop recv1
+  v51:b1 = drop dedup_key
+  v52:b1 = drop second_msg
+  v53:b1 = drop first_msg
+  return 0u8
+
+test t0
+  out 1u8
+end

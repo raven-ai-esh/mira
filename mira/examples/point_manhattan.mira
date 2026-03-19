@@ -1,0 +1,23 @@
+module types.point@1
+target native
+type point = struct[x:i32,y:i32]
+
+func point_manhattan
+arg x:i32
+arg y:i32
+ret i32
+eff pure
+spec kind=pack_extract domain=[x,y] constraints=[pure,no_alloc]
+block b0
+  v0:point = make point x y
+  v1:i32 = field v0 x
+  v2:i32 = field v0 y
+  v3:i32 = abs v1
+  v4:i32 = abs v2
+  v5:i32 = add v3 v4
+  return v5
+test t0
+  in x=-3i32
+  in y=4i32
+  out 7i32
+end

@@ -1,0 +1,17 @@
+module runtime.ffi@1
+target native
+
+func foreign_abs_delta
+arg x:i32
+ret i32
+eff ffi
+cap ffi("abs")
+spec kind=ffi constraints=[ffi,scalar_only]
+block b0
+  v0:i32 = ffi_call abs x
+  v1:i32 = sub v0 x
+  return v1
+test t0
+  in x=-7i32
+  out 14i32
+end

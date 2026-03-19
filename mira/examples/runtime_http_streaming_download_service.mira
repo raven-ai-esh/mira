@@ -1,0 +1,59 @@
+module runtime.http.streaming.download.service@1
+target native
+
+func inspect_streamed_request
+ret u8
+eff net alloc
+cap net("127.0.0.1:39611")
+spec kind=http constraints=[request_streaming,response_streaming]
+block b0
+  v0:own[buf[u8]] = buf_lit POST\x20/stream\x20HTTP/1.1\r\nHost:\x20localhost\r\nContent-Length:\x209\r\n\r\nSTREAMING
+  v1:view[buf[u8]] = view v0
+  v2:u64 = http_body_stream_open v1
+  v3:own[buf[u8]] = http_body_stream_next v2 3u32
+  v4:own[buf[u8]] = http_body_stream_next v2 3u32
+  v5:own[buf[u8]] = http_body_stream_next v2 3u32
+  v6:view[buf[u8]] = view v4
+  v7:u8 = load v6 0u32
+  v8:b1 = http_body_stream_close v2
+  v9:b1 = drop v5
+  v10:b1 = drop v4
+  v11:b1 = drop v3
+  v12:b1 = drop v0
+  return v7
+test t0
+  out 69u8
+end
+
+func serve_streaming_download_once
+ret u8
+eff net alloc
+cap net("127.0.0.1:39611")
+spec kind=http constraints=[request_streaming,response_streaming,server,session_protocol]
+block b0
+  v0:u64 = net_listen
+  v1:u64 = http_session_accept v0
+  v2:own[buf[u8]] = http_session_request v1
+  v3:view[buf[u8]] = view v2
+  v4:u64 = http_body_stream_open v3
+  v5:own[buf[u8]] = http_body_stream_next v4 4u32
+  v6:own[buf[u8]] = http_body_stream_next v4 5u32
+  v7:view[buf[u8]] = view v6
+  v8:u8 = load v7 0u32
+  v9:b1 = http_body_stream_close v4
+  v10:u32 = http_server_config_u32 status_ok
+  v11:u64 = http_response_stream_open v1 v10 application/octet-stream
+  v12:own[buf[u8]] = buf_lit HELLO
+  v13:own[buf[u8]] = buf_lit -WORLD
+  v14:b1 = http_response_stream_write v11 v12
+  v15:b1 = http_response_stream_write v11 v13
+  v16:b1 = http_response_stream_close v11
+  v17:b1 = http_session_close v1
+  v18:b1 = net_close v0
+  v19:b1 = drop v13
+  v20:b1 = drop v12
+  v21:b1 = drop v6
+  v22:b1 = drop v5
+  v23:b1 = drop v2
+  return v8
+end

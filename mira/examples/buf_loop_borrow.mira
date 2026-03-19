@@ -1,0 +1,32 @@
+module buf.loop.borrow@1
+target native
+
+func loop_borrow_sum
+ret i32
+eff alloc
+
+block b0
+  v0:own[buf[i32]] = alloc heap 1u32
+  v1:edit[buf[i32]] = edit v0
+  v2:edit[buf[i32]] = store v1 0u32 7i32
+  v3:view[buf[i32]] = view v2
+  jump b1(v0, v3, 0u32, 0i32)
+
+block b1(buf:own[buf[i32]], seen:view[buf[i32]], i:u32, acc:i32)
+  v4:b1 = lt i 2u32
+  branch v4 b2(buf, seen, i, acc) b3(buf, acc)
+
+block b2(buf:own[buf[i32]], seen:view[buf[i32]], i:u32, acc:i32)
+  v5:i32 = load seen 0u32
+  v6:i32 = add acc v5
+  v7:u32 = add i 1u32
+  v8:view[buf[i32]] = view buf
+  jump b1(buf, v8, v7, v6)
+
+block b3(buf:own[buf[i32]], acc:i32)
+  v9:b1 = drop buf
+  return acc
+
+test t0
+  out 14i32
+end

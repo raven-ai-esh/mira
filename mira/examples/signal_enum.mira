@@ -1,0 +1,47 @@
+module types.signal@1
+target native
+type signal = enum[idle,run,stop]
+
+func signal_pick
+arg code:u32
+ret signal
+eff pure
+spec kind=dispatch domain=code constraints=[pure,no_alloc]
+block b0
+  match code b1() b2() b3()
+block b1
+  v0:signal = const signal.idle
+  return v0
+block b2
+  v0:signal = const signal.run
+  return v0
+block b3
+  v0:signal = const signal.stop
+  return v0
+test t0
+  in code=0u32
+  out signal.idle
+test t1
+  in code=1u32
+  out signal.run
+test t2
+  in code=99u32
+  out signal.stop
+end
+
+func signal_is_stop
+arg sig:signal
+ret b1
+eff pure
+spec kind=predicate domain=sig constraints=[pure,no_alloc]
+block b0
+  v0:signal = const signal.stop
+  v1:b1 = eq sig v0
+  return v1
+test t0
+  in sig=signal.stop
+  out true
+test t1
+  in sig=signal.run
+  out false
+end

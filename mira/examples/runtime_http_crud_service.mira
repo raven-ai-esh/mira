@@ -1,0 +1,318 @@
+module runtime.http.crud.service@1
+target native
+
+func route_get_item_status
+ret u32
+eff net alloc
+cap net("127.0.0.1:39579")
+spec kind=http constraints=[router,middleware,response_model,route_params]
+block b0
+  v0:own[buf[u8]] = buf_lit GET\x20/items/42\x20HTTP/1.1\r\nHost:\x20localhost\r\nAuthorization:\x20token-42\r\n\r\n
+  v1:view[buf[u8]] = view v0
+  v2:own[buf[u8]] = http_request_method v1
+  v3:view[buf[u8]] = view v2
+  v4:b1 = buf_eq_lit v3 GET
+  branch v4 b1(v0, v2, v1) b9(v0, v2)
+
+block b1(req:own[buf[u8]], method:own[buf[u8]], req_view:view[buf[u8]])
+  v5:own[buf[u8]] = http_request_path req_view
+  v6:view[buf[u8]] = view v5
+  v7:b1 = buf_eq_lit v6 /items/42
+  branch v7 b2(req, method, v5, req_view) b7(req, method, v5)
+
+block b2(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]], req_view:view[buf[u8]])
+  v8:own[buf[u8]] = http_route_param req_view /items/:id id
+  v9:view[buf[u8]] = view v8
+  v10:u32 = buf_parse_u32 v9
+  v11:b1 = eq v10 42u32
+  branch v11 b3(req, method, path, v8, req_view) b8(req, method, path, v8)
+
+block b3(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]], item_id:own[buf[u8]], req_view:view[buf[u8]])
+  v12:b1 = http_header_eq req_view Authorization token-42
+  branch v12 b4(req, method, path, item_id) b6(req, method, path, item_id)
+
+block b4(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]], item_id:own[buf[u8]])
+  v13:u32 = http_server_config_u32 status_ok
+  v14:u32 = add v13 0u32
+  v16:b1 = drop item_id
+  v17:b1 = drop path
+  v18:b1 = drop method
+  v19:b1 = drop req
+  return v14
+
+block b6(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]], item_id:own[buf[u8]])
+  v20:u32 = http_server_config_u32 status_unauthorized
+  v21:u32 = add v20 0u32
+  v23:b1 = drop item_id
+  v24:b1 = drop path
+  v25:b1 = drop method
+  v26:b1 = drop req
+  return v21
+
+block b7(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]])
+  v27:u32 = http_server_config_u32 status_not_found
+  v28:u32 = add v27 0u32
+  v30:b1 = drop path
+  v31:b1 = drop method
+  v32:b1 = drop req
+  return v28
+
+block b8(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]], item_id:own[buf[u8]])
+  v33:u32 = http_server_config_u32 status_not_found
+  v34:u32 = add v33 0u32
+  v36:b1 = drop item_id
+  v37:b1 = drop path
+  v38:b1 = drop method
+  v39:b1 = drop req
+  return v34
+
+block b9(req:own[buf[u8]], method:own[buf[u8]])
+  v40:u32 = http_server_config_u32 status_not_found
+  v41:u32 = add v40 0u32
+  v43:b1 = drop method
+  v44:b1 = drop req
+  return v41
+
+test t0
+  out 200u32
+end
+
+func route_post_item_status
+ret u32
+eff net alloc
+cap net("127.0.0.1:39579")
+spec kind=http constraints=[router,middleware,body_limit,response_model]
+block b0
+  v0:own[buf[u8]] = buf_lit POST\x20/items\x20HTTP/1.1\r\nHost:\x20localhost\r\nAuthorization:\x20token-42\r\nContent-Length:\x2011\r\n\r\nhello-world
+  v1:view[buf[u8]] = view v0
+  v2:own[buf[u8]] = http_request_method v1
+  v3:view[buf[u8]] = view v2
+  v4:b1 = buf_eq_lit v3 POST
+  branch v4 b1(v0, v2, v1) b9(v0, v2)
+
+block b1(req:own[buf[u8]], method:own[buf[u8]], req_view:view[buf[u8]])
+  v5:own[buf[u8]] = http_request_path req_view
+  v6:view[buf[u8]] = view v5
+  v7:b1 = buf_eq_lit v6 /items
+  branch v7 b2(req, method, v5, req_view) b5(req, method, v5)
+
+block b2(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]], req_view:view[buf[u8]])
+  v8:b1 = http_header_eq req_view Authorization token-42
+  branch v8 b3(req, method, path, req_view) b6(req, method, path)
+
+block b3(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]], req_view:view[buf[u8]])
+  v9:u32 = http_server_config_u32 body_limit_small
+  v10:b1 = http_body_limit req_view v9
+  branch v10 b4(req, method, path) b8(req, method, path)
+
+block b4(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]])
+  v11:u32 = http_server_config_u32 status_created
+  v12:u32 = add v11 0u32
+  v14:b1 = drop path
+  v15:b1 = drop method
+  v16:b1 = drop req
+  return v12
+
+block b5(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]])
+  v17:u32 = http_server_config_u32 status_not_found
+  v18:u32 = add v17 0u32
+  v20:b1 = drop path
+  v21:b1 = drop method
+  v22:b1 = drop req
+  return v18
+
+block b6(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]])
+  v23:u32 = http_server_config_u32 status_unauthorized
+  v24:u32 = add v23 0u32
+  v26:b1 = drop path
+  v27:b1 = drop method
+  v28:b1 = drop req
+  return v24
+
+block b8(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]])
+  v29:u32 = http_server_config_u32 status_payload_too_large
+  v30:u32 = add v29 0u32
+  v32:b1 = drop path
+  v33:b1 = drop method
+  v34:b1 = drop req
+  return v30
+
+block b9(req:own[buf[u8]], method:own[buf[u8]])
+  v35:u32 = http_server_config_u32 status_not_found
+  v36:u32 = add v35 0u32
+  v38:b1 = drop method
+  v39:b1 = drop req
+  return v36
+
+test t0
+  out 201u32
+end
+
+func route_post_item_too_large_status
+ret u32
+eff net alloc
+cap net("127.0.0.1:39579")
+spec kind=http constraints=[router,body_limit,error_policy]
+block b0
+  v0:own[buf[u8]] = buf_lit POST\x20/items\x20HTTP/1.1\r\nHost:\x20localhost\r\nAuthorization:\x20token-42\r\nContent-Length:\x2050\r\n\r\nabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwx
+  v1:view[buf[u8]] = view v0
+  v2:u32 = http_server_config_u32 body_limit_small
+  v3:b1 = http_body_limit v1 v2
+  branch v3 b1(v0) b2(v0)
+
+block b1(req:own[buf[u8]])
+  v4:b1 = drop req
+  return 0u32
+
+block b2(req:own[buf[u8]])
+  v5:u32 = http_server_config_u32 status_payload_too_large
+  v6:b1 = drop req
+  return v5
+
+test t0
+  out 413u32
+end
+
+func route_unauthorized_status
+ret u32
+eff net alloc
+cap net("127.0.0.1:39579")
+spec kind=http constraints=[middleware,error_policy]
+block b0
+  v0:own[buf[u8]] = buf_lit GET\x20/items/42\x20HTTP/1.1\r\nHost:\x20localhost\r\nAuthorization:\x20wrong\r\n\r\n
+  v1:view[buf[u8]] = view v0
+  v2:b1 = http_header_eq v1 Authorization token-42
+  branch v2 b1(v0) b2(v0)
+
+block b1(req:own[buf[u8]])
+  v3:b1 = drop req
+  return 0u32
+
+block b2(req:own[buf[u8]])
+  v4:u32 = http_server_config_u32 status_unauthorized
+  v5:b1 = drop req
+  return v4
+
+test t0
+  out 401u32
+end
+
+func serve_items_once
+ret u8
+eff net alloc
+cap net("127.0.0.1:39579")
+spec kind=http constraints=[crud,router,middleware,response_model,server]
+block b0
+  v0:u64 = net_listen
+  v1:u64 = http_session_accept v0
+  v2:own[buf[u8]] = http_session_request v1
+  v3:view[buf[u8]] = view v2
+  v4:own[buf[u8]] = http_request_method v3
+  v5:view[buf[u8]] = view v4
+  v6:b1 = buf_eq_lit v5 GET
+  branch v6 b1(v0, v1, v2, v3, v4) b7(v0, v1, v2, v3, v4)
+
+block b1(listener:u64, conn:u64, req:own[buf[u8]], req_view:view[buf[u8]], method:own[buf[u8]])
+  v7:own[buf[u8]] = http_route_param req_view /items/:id id
+  v8:view[buf[u8]] = view v7
+  v9:u32 = buf_parse_u32 v8
+  v10:b1 = eq v9 42u32
+  branch v10 b2(listener, conn, req, req_view, method, v7) b10(listener, conn, req, method, v7)
+
+block b2(listener:u64, conn:u64, req:own[buf[u8]], req_view:view[buf[u8]], method:own[buf[u8]], item_id:own[buf[u8]])
+  v11:b1 = http_header_eq req_view Authorization token-42
+  branch v11 b3(listener, conn, req, method, item_id) b11(listener, conn, req, method, item_id)
+
+block b3(listener:u64, conn:u64, req:own[buf[u8]], method:own[buf[u8]], item_id:own[buf[u8]])
+  v12:u32 = http_server_config_u32 status_ok
+  v13:u32 = add v12 0u32
+  v15:own[buf[u8]] = buf_lit \x7b\x22id\x22:42\x7d
+  v16:b1 = http_session_write_json conn v13 v15
+  v17:b1 = http_session_close conn
+  v18:b1 = net_close listener
+  v19:b1 = drop v15
+  v20:b1 = drop item_id
+  v21:b1 = drop method
+  v22:b1 = drop req
+  return 1u8
+
+block b7(listener:u64, conn:u64, req:own[buf[u8]], req_view:view[buf[u8]], method:own[buf[u8]])
+  v23:view[buf[u8]] = view method
+  v24:b1 = buf_eq_lit v23 POST
+  branch v24 b8(listener, conn, req, req_view, method) b12(listener, conn, req, method)
+
+block b8(listener:u64, conn:u64, req:own[buf[u8]], req_view:view[buf[u8]], method:own[buf[u8]])
+  v25:own[buf[u8]] = http_request_path req_view
+  v26:view[buf[u8]] = view v25
+  v27:b1 = buf_eq_lit v26 /items
+  branch v27 b9(listener, conn, req, req_view, method, v25) b10(listener, conn, req, method, v25)
+
+block b9(listener:u64, conn:u64, req:own[buf[u8]], req_view:view[buf[u8]], method:own[buf[u8]], path:own[buf[u8]])
+  v28:b1 = http_header_eq req_view Authorization token-42
+  branch v28 b13(listener, conn, req, req_view, method, path) b11(listener, conn, req, method, path)
+
+block b10(listener:u64, conn:u64, req:own[buf[u8]], method:own[buf[u8]], route_buf:own[buf[u8]])
+  v29:own[buf[u8]] = buf_lit NO
+  v30:u32 = http_server_config_u32 status_not_found
+  v31:b1 = http_session_write_text conn v30 v29
+  v32:b1 = http_session_close conn
+  v33:b1 = net_close listener
+  v34:b1 = drop v29
+  v35:b1 = drop route_buf
+  v36:b1 = drop method
+  v37:b1 = drop req
+  return 0u8
+
+block b11(listener:u64, conn:u64, req:own[buf[u8]], method:own[buf[u8]], route_buf:own[buf[u8]])
+  v38:own[buf[u8]] = buf_lit NO
+  v39:u32 = http_server_config_u32 status_unauthorized
+  v40:b1 = http_session_write_text conn v39 v38
+  v41:b1 = http_session_close conn
+  v42:b1 = net_close listener
+  v43:b1 = drop v38
+  v44:b1 = drop route_buf
+  v45:b1 = drop method
+  v46:b1 = drop req
+  return 0u8
+
+block b12(listener:u64, conn:u64, req:own[buf[u8]], method:own[buf[u8]])
+  v47:own[buf[u8]] = buf_lit NO
+  v48:u32 = http_server_config_u32 status_method_not_allowed
+  v49:b1 = http_session_write_text conn v48 v47
+  v50:b1 = http_session_close conn
+  v51:b1 = net_close listener
+  v52:b1 = drop v47
+  v53:b1 = drop method
+  v54:b1 = drop req
+  return 0u8
+
+block b13(listener:u64, conn:u64, req:own[buf[u8]], req_view:view[buf[u8]], method:own[buf[u8]], path:own[buf[u8]])
+  v55:u32 = http_server_config_u32 body_limit_small
+  v56:b1 = http_body_limit req_view v55
+  branch v56 b14(listener, conn, req, method, path) b15(listener, conn, req, method, path)
+
+block b14(listener:u64, conn:u64, req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]])
+  v57:u32 = http_server_config_u32 status_created
+  v58:u32 = add v57 0u32
+  v60:own[buf[u8]] = buf_lit \x7b\x22created\x22:true\x7d
+  v61:b1 = http_session_write_json conn v58 v60
+  v62:b1 = http_session_close conn
+  v63:b1 = net_close listener
+  v64:b1 = drop v60
+  v65:b1 = drop path
+  v66:b1 = drop method
+  v67:b1 = drop req
+  return 1u8
+
+block b15(listener:u64, conn:u64, req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]])
+  v68:own[buf[u8]] = buf_lit NO
+  v69:u32 = http_server_config_u32 status_payload_too_large
+  v70:b1 = http_session_write_text conn v69 v68
+  v71:b1 = http_session_close conn
+  v72:b1 = net_close listener
+  v73:b1 = drop v68
+  v74:b1 = drop path
+  v75:b1 = drop method
+  v76:b1 = drop req
+  return 0u8
+end

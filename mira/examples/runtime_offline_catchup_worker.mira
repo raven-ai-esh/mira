@@ -1,0 +1,121 @@
+module runtime.offline.catchup.worker@1
+target native
+
+func offline_catchup_worker_status
+ret u8
+eff alloc net service
+cap net("127.0.0.1:1")
+cap service("offline-catchup")
+spec kind=message constraints=[offline,replay,catchup,failure_class]
+block b0
+  v0:u64 = service_open
+  v1:u64 = service_trace_begin v0 catchup
+  v2:u64 = msg_log_open
+  v3:own[buf[u8]] = buf_lit off1
+  v4:own[buf[u8]] = buf_lit off2
+  v5:own[buf[u8]] = buf_lit off3
+  v6:u32 = msg_send v2 conv_offline alice v3
+  v7:u32 = msg_send v2 conv_offline alice v4
+  v8:u32 = msg_send v2 conv_offline alice v5
+  v81:b1 = drop v3
+  v9:b1 = eq v6 1u32
+  branch v9 b1(v0, v1, v2, v4, v5, v7, v8) b10(v0, v1, v2, v4, v5)
+
+block b1(service:u64, trace:u64, log:u64, second_msg:own[buf[u8]], third_msg:own[buf[u8]], second_seq:u32, third_seq:u32)
+  v10:b1 = eq second_seq 2u32
+  branch v10 b2(service, trace, log, second_msg, third_msg, third_seq) b11(service, trace, log, second_msg, third_msg)
+
+block b2(service:u64, trace:u64, log:u64, second_msg:own[buf[u8]], third_msg:own[buf[u8]], third_seq:u32)
+  v11:b1 = eq third_seq 3u32
+  branch v11 b3(service, trace, log, second_msg, third_msg) b11(service, trace, log, second_msg, third_msg)
+
+block b3(service:u64, trace:u64, log:u64, second_msg:own[buf[u8]], third_msg:own[buf[u8]])
+  v12:u64 = msg_replay_open log alice 2u32
+  v13:own[buf[u8]] = msg_replay_next v12
+  v14:view[buf[u8]] = view v13
+  v15:b1 = buf_eq_lit v14 off2
+  branch v15 b4(service, trace, log, second_msg, third_msg, v12, v13) b12(service, trace, log, second_msg, third_msg, v12, v13)
+
+block b4(service:u64, trace:u64, log:u64, second_msg:own[buf[u8]], third_msg:own[buf[u8]], replay:u64, replay_first:own[buf[u8]])
+  v16:u32 = msg_replay_seq replay
+  v17:b1 = eq v16 2u32
+  branch v17 b5(service, trace, log, second_msg, third_msg, replay, replay_first) b12(service, trace, log, second_msg, third_msg, replay, replay_first)
+
+block b5(service:u64, trace:u64, log:u64, second_msg:own[buf[u8]], third_msg:own[buf[u8]], replay:u64, replay_first:own[buf[u8]])
+  v18:own[buf[u8]] = msg_replay_next replay
+  v19:view[buf[u8]] = view v18
+  v20:b1 = buf_eq_lit v19 off3
+  branch v20 b6(service, trace, log, second_msg, third_msg, replay, replay_first, v18) b13(service, trace, log, second_msg, third_msg, replay, replay_first, v18)
+
+block b6(service:u64, trace:u64, log:u64, second_msg:own[buf[u8]], third_msg:own[buf[u8]], replay:u64, replay_first:own[buf[u8]], replay_second:own[buf[u8]])
+  v21:u32 = msg_replay_seq replay
+  v22:b1 = eq v21 3u32
+  branch v22 b7(service, trace, log, second_msg, third_msg, replay, replay_first, replay_second) b13(service, trace, log, second_msg, third_msg, replay, replay_first, replay_second)
+
+block b7(service:u64, trace:u64, log:u64, second_msg:own[buf[u8]], third_msg:own[buf[u8]], replay:u64, replay_first:own[buf[u8]], replay_second:own[buf[u8]])
+  v23:b1 = msg_ack log alice 9u32
+  branch v23 b13(service, trace, log, second_msg, third_msg, replay, replay_first, replay_second) b8(service, trace, log, second_msg, third_msg, replay, replay_first, replay_second)
+
+block b8(service:u64, trace:u64, log:u64, second_msg:own[buf[u8]], third_msg:own[buf[u8]], replay:u64, replay_first:own[buf[u8]], replay_second:own[buf[u8]])
+  v24:u32 = msg_failure_class log
+  v25:b1 = eq v24 2u32
+  branch v25 b9(service, trace, log, second_msg, third_msg, replay, replay_first, replay_second) b13(service, trace, log, second_msg, third_msg, replay, replay_first, replay_second)
+
+block b9(service:u64, trace:u64, log:u64, second_msg:own[buf[u8]], third_msg:own[buf[u8]], replay:u64, replay_first:own[buf[u8]], replay_second:own[buf[u8]])
+  v26:b1 = service_metric_count_dim service replayed catchup 2u32
+  v27:u32 = service_metric_total service replayed
+  v28:b1 = eq v27 2u32
+  branch v28 b14(service, trace, log, second_msg, third_msg, replay, replay_first, replay_second) b13(service, trace, log, second_msg, third_msg, replay, replay_first, replay_second)
+
+block b10(service:u64, trace:u64, log:u64, second_msg:own[buf[u8]], third_msg:own[buf[u8]])
+  v29:b1 = service_trace_end trace
+  v30:b1 = msg_log_close log
+  v31:b1 = service_close service
+  v32:b1 = drop third_msg
+  v33:b1 = drop second_msg
+  return 0u8
+
+block b11(service:u64, trace:u64, log:u64, second_msg:own[buf[u8]], third_msg:own[buf[u8]])
+  v35:b1 = service_trace_end trace
+  v36:b1 = msg_log_close log
+  v37:b1 = service_close service
+  v38:b1 = drop third_msg
+  v39:b1 = drop second_msg
+  return 0u8
+
+block b12(service:u64, trace:u64, log:u64, second_msg:own[buf[u8]], third_msg:own[buf[u8]], replay:u64, replay_first:own[buf[u8]])
+  v40:b1 = msg_replay_close replay
+  v41:b1 = service_trace_end trace
+  v42:b1 = msg_log_close log
+  v43:b1 = service_close service
+  v44:b1 = drop replay_first
+  v45:b1 = drop third_msg
+  v46:b1 = drop second_msg
+  return 0u8
+
+block b13(service:u64, trace:u64, log:u64, second_msg:own[buf[u8]], third_msg:own[buf[u8]], replay:u64, replay_first:own[buf[u8]], replay_second:own[buf[u8]])
+  v47:b1 = msg_replay_close replay
+  v48:b1 = service_trace_end trace
+  v49:b1 = msg_log_close log
+  v50:b1 = service_close service
+  v51:b1 = drop replay_second
+  v52:b1 = drop replay_first
+  v53:b1 = drop third_msg
+  v54:b1 = drop second_msg
+  return 0u8
+
+block b14(service:u64, trace:u64, log:u64, second_msg:own[buf[u8]], third_msg:own[buf[u8]], replay:u64, replay_first:own[buf[u8]], replay_second:own[buf[u8]])
+  v55:b1 = service_event service replay_ok replay_second
+  v56:b1 = msg_replay_close replay
+  v57:b1 = service_trace_end trace
+  v58:b1 = msg_log_close log
+  v59:b1 = service_close service
+  v60:b1 = drop replay_second
+  v61:b1 = drop replay_first
+  v62:b1 = drop third_msg
+  v63:b1 = drop second_msg
+  return 1u8
+
+test t0
+  out 1u8
+end

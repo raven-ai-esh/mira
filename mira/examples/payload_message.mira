@@ -1,0 +1,46 @@
+module types.payload@1
+target native
+type message = enum[idle,data[value:i32],pair[left:i32,right:i32]]
+
+func message_score
+arg tag:u32
+arg x:i32
+ret i32
+eff pure
+spec kind=dispatch domain=tag constraints=[pure,no_alloc]
+block b0
+  match tag b1(x) b2(x) b3(x)
+block b1(p:i32)
+  v0:message = make message idle
+  jump b4(v0)
+block b2(p:i32)
+  v1:message = make message data p
+  jump b4(v1)
+block b3(p:i32)
+  v2:message = make message pair p p
+  jump b4(v2)
+block b4(msg:message)
+  match msg b5() b6(msg) b7(msg)
+block b5
+  return 0i32
+block b6(msg:message)
+  v3:i32 = field msg data.value
+  return v3
+block b7(msg:message)
+  v4:i32 = field msg pair.left
+  v5:i32 = field msg pair.right
+  v6:i32 = add v4 v5
+  return v6
+test t0
+  in tag=0u32
+  in x=9i32
+  out 0i32
+test t1
+  in tag=1u32
+  in x=7i32
+  out 7i32
+test t2
+  in tag=2u32
+  in x=4i32
+  out 8i32
+end

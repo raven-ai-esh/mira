@@ -1,0 +1,26 @@
+module control.match@1
+target native
+
+func tag_dispatch
+arg tag:u32
+ret i32
+eff pure
+spec kind=dispatch domain=tag constraints=[pure,no_alloc]
+block b0
+  match tag b1() b2() b3()
+block b1
+  return 10i32
+block b2
+  return 20i32
+block b3
+  return 30i32
+test t0
+  in tag=0u32
+  out 10i32
+test t1
+  in tag=1u32
+  out 20i32
+test t2
+  in tag=9u32
+  out 30i32
+end

@@ -1,0 +1,15 @@
+module vec.fixed@1
+target native
+
+func vec_pick
+arg xs:vec[3,i32]
+ret i32
+eff pure
+spec kind=index domain=xs constraints=[pure,no_alloc]
+block b0
+  v0:i32 = load xs 1u32
+  return v0
+test t0
+  in xs=[10i32,20i32,30i32]
+  out 20i32
+end

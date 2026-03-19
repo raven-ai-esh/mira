@@ -1,0 +1,70 @@
+module runtime.http.cookie_flow@1
+target native
+
+func parse_cookie_and_authorize
+ret u8
+eff net alloc
+cap net("127.0.0.1:18080")
+spec kind=http constraints=[http,cookies,headers,response]
+block b0
+  v0:own[buf[u8]] = buf_lit GET\x20/profile\x20HTTP/1.1\r\nHost:\x20localhost\r\nCookie:\x20sid=abc123;\x20theme=dark\r\n\r\n
+  v1:view[buf[u8]] = view v0
+  v2:own[buf[u8]] = http_cookie v1 sid
+  v3:view[buf[u8]] = view v2
+  v4:b1 = buf_eq_lit v3 abc123
+  branch v4 b1(v0, v1, v2) b4(v0, v2)
+
+block b1(req:own[buf[u8]], req_view:view[buf[u8]], sid:own[buf[u8]])
+  v5:b1 = http_cookie_eq req_view theme dark
+  branch v5 b2(req, sid) b3(req, sid)
+
+block b2(req:own[buf[u8]], sid:own[buf[u8]])
+  v6:b1 = drop sid
+  v7:b1 = drop req
+  return 1u8
+
+block b3(req:own[buf[u8]], sid:own[buf[u8]])
+  v8:b1 = drop sid
+  v9:b1 = drop req
+  return 0u8
+
+block b4(req:own[buf[u8]], sid:own[buf[u8]])
+  v10:b1 = drop sid
+  v11:b1 = drop req
+  return 0u8
+
+test t0
+  out 1u8
+end
+
+func serve_cookie_once
+ret u8
+eff net alloc
+cap net("127.0.0.1:39572")
+spec kind=http constraints=[http,cookies,server,response]
+block b0
+  v0:u64 = net_listen
+  v1:u64 = http_session_accept v0
+  v2:own[buf[u8]] = http_session_request v1
+  v3:view[buf[u8]] = view v2
+  v4:b1 = http_cookie_eq v3 sid abc123
+  branch v4 b1(v0, v1, v2) b2(v0, v1, v2)
+
+block b1(listener:u64, conn:u64, req:own[buf[u8]])
+  v5:own[buf[u8]] = buf_lit OK
+  v6:b1 = http_session_write_text_cookie conn 200u32 sid fresh456 v5
+  v7:b1 = http_session_close conn
+  v8:b1 = net_close listener
+  v9:b1 = drop v5
+  v10:b1 = drop req
+  return 1u8
+
+block b2(listener:u64, conn:u64, req:own[buf[u8]])
+  v11:own[buf[u8]] = buf_lit NO
+  v12:b1 = http_session_write_text conn 403u32 v11
+  v13:b1 = http_session_close conn
+  v14:b1 = net_close listener
+  v15:b1 = drop v11
+  v16:b1 = drop req
+  return 0u8
+end

@@ -1,0 +1,32 @@
+module runtime.db.sqlite@1
+target native
+
+func init_and_query_count
+ret u8
+eff db alloc fs.write
+cap db("/tmp/mira_runtime_db.sqlite")
+spec kind=db constraints=[sqlite,handles,query]
+block b0
+  v0:u64 = db_open /tmp/mira_runtime_db.sqlite
+  v1:own[buf[u8]] = buf_lit DROP\x20TABLE\x20IF\x20EXISTS\x20items;\x20CREATE\x20TABLE\x20items(value\x20INTEGER);\x20INSERT\x20INTO\x20items(value)\x20VALUES\x20(1),(2),(3),(1);\x20
+  v2:b1 = db_exec v0 v1
+  v3:own[buf[u8]] = buf_lit SELECT\x20COUNT(*)\x20FROM\x20items\x20WHERE\x20value\x20=\x201;
+  v4:u32 = db_query_u32 v0 v3
+  v5:b1 = eq v4 2u32
+  branch v5 b1(v0, v1, v3) b2(v0, v1, v3)
+
+block b1(dbh:u64, setup:own[buf[u8]], query:own[buf[u8]])
+  v6:b1 = db_close dbh
+  v7:b1 = drop query
+  v8:b1 = drop setup
+  return 1u8
+
+block b2(dbh:u64, setup:own[buf[u8]], query:own[buf[u8]])
+  v9:b1 = db_close dbh
+  v10:b1 = drop query
+  v11:b1 = drop setup
+  return 0u8
+
+test t0
+  out 1u8
+end

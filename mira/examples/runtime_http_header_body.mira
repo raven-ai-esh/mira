@@ -1,0 +1,38 @@
+module runtime.http.header_body@1
+target native
+
+func parse_header_and_body
+ret u8
+eff net alloc
+cap net("127.0.0.1:18080")
+spec kind=http constraints=[http,headers,body,bytes]
+block b0
+  v0:own[buf[u8]] = buf_lit POST\x20/x\x20HTTP/1.1\r\nX-Test:\x20yes\r\n\r\nok
+  v1:view[buf[u8]] = view v0
+  v2:b1 = http_header_eq v1 X-Test yes
+  branch v2 b1(v0, v1) b4(v0)
+
+block b1(req:own[buf[u8]], req_view:view[buf[u8]])
+  v3:own[buf[u8]] = http_body req_view
+  v4:view[buf[u8]] = view v3
+  v5:u8 = load v4 1u32
+  v6:b1 = eq v5 107u8
+  branch v6 b2(req, v3) b3(req, v3)
+
+block b2(req:own[buf[u8]], body:own[buf[u8]])
+  v7:b1 = drop body
+  v8:b1 = drop req
+  return 1u8
+
+block b3(req:own[buf[u8]], body:own[buf[u8]])
+  v9:b1 = drop body
+  v10:b1 = drop req
+  return 0u8
+
+block b4(req:own[buf[u8]])
+  v11:b1 = drop req
+  return 0u8
+
+test t0
+  out 1u8
+end

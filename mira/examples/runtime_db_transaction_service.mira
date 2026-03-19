@@ -1,0 +1,144 @@
+module runtime.db.transaction.service@1
+target native
+
+func transaction_state_status
+ret u8
+eff db alloc net
+cap db("/tmp/mira_llm_1_2_tx.sqlite")
+cap net("127.0.0.1:1")
+spec kind=db constraints=[transaction,row,result,error,prepared]
+block b0
+  v0:u64 = db_open /tmp/mira_llm_1_2_tx.sqlite
+  v1:own[buf[u8]] = buf_lit DROP\x20TABLE\x20IF\x20EXISTS\x20counters;\x20CREATE\x20TABLE\x20counters(id\x20INTEGER\x20PRIMARY\x20KEY,\x20value\x20INTEGER\x20NOT\x20NULL,\x20name\x20TEXT\x20NOT\x20NULL);\x20INSERT\x20INTO\x20counters(id,\x20value,\x20name)\x20VALUES\x20(1,\x207,\x20\x27alpha\x27);\x20
+  v2:b1 = db_exec v0 v1
+  v3:own[buf[u8]] = buf_lit UPDATE\x20counters\x20SET\x20value\x20=\x20value\x20+\x20$1\x20WHERE\x20id\x20=\x201;
+  v4:b1 = db_prepare v0 inc_counter v3
+  v5:own[buf[u8]] = buf_lit SELECT\x20json_object(\x27value\x27,\x20value,\x20\x27name\x27,\x20name)\x20FROM\x20counters\x20WHERE\x20id\x20=\x201;
+  v6:b1 = db_prepare v0 get_counter v5
+  v7:b1 = db_begin v0
+  v8:own[buf[u8]] = buf_lit [5]
+  v9:b1 = db_exec_prepared v0 inc_counter v8
+  v10:b1 = db_commit v0
+  v11:own[buf[u8]] = buf_lit []
+  v12:own[buf[u8]] = db_query_prepared_row v0 get_counter v11
+  v13:b1 = db_row_found v12
+  branch v13 b1(v0, v1, v3, v5, v8, v11, v12) b8(v0, v1, v3, v5, v8, v11, v12)
+
+block b1(dbh:u64, setup:own[buf[u8]], inc_stmt:own[buf[u8]], row_stmt:own[buf[u8]], inc_params:own[buf[u8]], row_params:own[buf[u8]], row:own[buf[u8]])
+  v14:own[buf[u8]] = buf_lit SELECT\x20value\x20FROM\x20counters\x20WHERE\x20id\x20=\x201;
+  v15:u32 = db_query_u32 dbh v14
+  v16:b1 = eq v15 12u32
+  branch v16 b2(dbh, setup, inc_stmt, row_stmt, inc_params, row_params, row, v14) b9(dbh, setup, inc_stmt, row_stmt, inc_params, row_params, row, v14)
+
+block b2(dbh:u64, setup:own[buf[u8]], inc_stmt:own[buf[u8]], row_stmt:own[buf[u8]], inc_params:own[buf[u8]], row_params:own[buf[u8]], row:own[buf[u8]], value_sql:own[buf[u8]])
+  v17:own[buf[u8]] = buf_lit SELECT\x20name\x20FROM\x20counters\x20WHERE\x20id\x20=\x201;
+  v18:own[buf[u8]] = db_query_buf dbh v17
+  v19:view[buf[u8]] = view v18
+  v20:b1 = buf_eq_lit v19 alpha
+  branch v20 b3(dbh, setup, inc_stmt, row_stmt, inc_params, row_params, row, value_sql, v17, v18) b10(dbh, setup, inc_stmt, row_stmt, inc_params, row_params, row, value_sql, v17, v18)
+
+block b3(dbh:u64, setup:own[buf[u8]], inc_stmt:own[buf[u8]], row_stmt:own[buf[u8]], inc_params:own[buf[u8]], row_params:own[buf[u8]], row:own[buf[u8]], value_sql:own[buf[u8]], name_sql:own[buf[u8]], name_value:own[buf[u8]])
+  v21:b1 = db_begin dbh
+  v22:own[buf[u8]] = buf_lit [2]
+  v23:b1 = db_exec_prepared dbh inc_counter v22
+  v24:b1 = db_rollback dbh
+  v25:own[buf[u8]] = buf_lit SELECT\x20value\x20FROM\x20counters\x20WHERE\x20id\x20=\x201;
+  v26:u32 = db_query_u32 dbh v25
+  v27:b1 = eq v26 12u32
+  branch v27 b4(dbh, setup, inc_stmt, row_stmt, inc_params, row_params, row, value_sql, name_sql, name_value, v22, v25) b11(dbh, setup, inc_stmt, row_stmt, inc_params, row_params, row, value_sql, name_sql, name_value, v22, v25)
+
+block b4(dbh:u64, setup:own[buf[u8]], inc_stmt:own[buf[u8]], row_stmt:own[buf[u8]], inc_params:own[buf[u8]], row_params:own[buf[u8]], row:own[buf[u8]], value_sql:own[buf[u8]], name_sql:own[buf[u8]], name_value:own[buf[u8]], rollback_params:own[buf[u8]], rollback_value_sql:own[buf[u8]])
+  v28:own[buf[u8]] = buf_lit INSRT\x20INTO\x20counters(id,\x20value,\x20name)\x20VALUES\x20(2,\x201,\x20\x27bad\x27);
+  v29:b1 = db_exec dbh v28
+  v30:u32 = db_last_error_code dbh
+  v31:b1 = db_last_error_retryable dbh
+  v32:b1 = eq v30 0u32
+  branch v32 b12(dbh, setup, inc_stmt, row_stmt, inc_params, row_params, row, value_sql, name_sql, name_value, rollback_params, rollback_value_sql, v28) b5(dbh, setup, inc_stmt, row_stmt, inc_params, row_params, row, value_sql, name_sql, name_value, rollback_params, rollback_value_sql, v28, v31)
+
+block b5(dbh:u64, setup:own[buf[u8]], inc_stmt:own[buf[u8]], row_stmt:own[buf[u8]], inc_params:own[buf[u8]], row_params:own[buf[u8]], row:own[buf[u8]], value_sql:own[buf[u8]], name_sql:own[buf[u8]], name_value:own[buf[u8]], rollback_params:own[buf[u8]], rollback_value_sql:own[buf[u8]], bad_sql:own[buf[u8]], retryable:b1)
+  branch retryable b12(dbh, setup, inc_stmt, row_stmt, inc_params, row_params, row, value_sql, name_sql, name_value, rollback_params, rollback_value_sql, bad_sql) b6(dbh, setup, inc_stmt, row_stmt, inc_params, row_params, row, value_sql, name_sql, name_value, rollback_params, rollback_value_sql, bad_sql)
+
+block b6(dbh:u64, setup:own[buf[u8]], inc_stmt:own[buf[u8]], row_stmt:own[buf[u8]], inc_params:own[buf[u8]], row_params:own[buf[u8]], row:own[buf[u8]], value_sql:own[buf[u8]], name_sql:own[buf[u8]], name_value:own[buf[u8]], rollback_params:own[buf[u8]], rollback_value_sql:own[buf[u8]], bad_sql:own[buf[u8]])
+  v33:b1 = db_close dbh
+  v34:b1 = drop bad_sql
+  v35:b1 = drop rollback_value_sql
+  v36:b1 = drop rollback_params
+  v37:b1 = drop name_value
+  v38:b1 = drop name_sql
+  v39:b1 = drop value_sql
+  v40:b1 = drop row
+  v41:b1 = drop row_params
+  v42:b1 = drop inc_params
+  v43:b1 = drop row_stmt
+  v44:b1 = drop inc_stmt
+  v45:b1 = drop setup
+  return 1u8
+
+block b8(dbh:u64, setup:own[buf[u8]], inc_stmt:own[buf[u8]], row_stmt:own[buf[u8]], inc_params:own[buf[u8]], row_params:own[buf[u8]], row:own[buf[u8]])
+  v46:b1 = db_close dbh
+  v47:b1 = drop row
+  v48:b1 = drop row_params
+  v49:b1 = drop inc_params
+  v50:b1 = drop row_stmt
+  v51:b1 = drop inc_stmt
+  v52:b1 = drop setup
+  return 0u8
+
+block b9(dbh:u64, setup:own[buf[u8]], inc_stmt:own[buf[u8]], row_stmt:own[buf[u8]], inc_params:own[buf[u8]], row_params:own[buf[u8]], row:own[buf[u8]], value_sql:own[buf[u8]])
+  v53:b1 = db_close dbh
+  v54:b1 = drop value_sql
+  v55:b1 = drop row
+  v56:b1 = drop row_params
+  v57:b1 = drop inc_params
+  v58:b1 = drop row_stmt
+  v59:b1 = drop inc_stmt
+  v60:b1 = drop setup
+  return 0u8
+
+block b10(dbh:u64, setup:own[buf[u8]], inc_stmt:own[buf[u8]], row_stmt:own[buf[u8]], inc_params:own[buf[u8]], row_params:own[buf[u8]], row:own[buf[u8]], value_sql:own[buf[u8]], name_sql:own[buf[u8]], name_value:own[buf[u8]])
+  v61:b1 = db_close dbh
+  v62:b1 = drop name_value
+  v63:b1 = drop name_sql
+  v64:b1 = drop value_sql
+  v65:b1 = drop row
+  v66:b1 = drop row_params
+  v67:b1 = drop inc_params
+  v68:b1 = drop row_stmt
+  v69:b1 = drop inc_stmt
+  v70:b1 = drop setup
+  return 0u8
+
+block b11(dbh:u64, setup:own[buf[u8]], inc_stmt:own[buf[u8]], row_stmt:own[buf[u8]], inc_params:own[buf[u8]], row_params:own[buf[u8]], row:own[buf[u8]], value_sql:own[buf[u8]], name_sql:own[buf[u8]], name_value:own[buf[u8]], rollback_params:own[buf[u8]], rollback_value_sql:own[buf[u8]])
+  v71:b1 = db_close dbh
+  v72:b1 = drop rollback_value_sql
+  v73:b1 = drop rollback_params
+  v74:b1 = drop name_value
+  v75:b1 = drop name_sql
+  v76:b1 = drop value_sql
+  v77:b1 = drop row
+  v78:b1 = drop row_params
+  v79:b1 = drop inc_params
+  v80:b1 = drop row_stmt
+  v81:b1 = drop inc_stmt
+  v82:b1 = drop setup
+  return 0u8
+
+block b12(dbh:u64, setup:own[buf[u8]], inc_stmt:own[buf[u8]], row_stmt:own[buf[u8]], inc_params:own[buf[u8]], row_params:own[buf[u8]], row:own[buf[u8]], value_sql:own[buf[u8]], name_sql:own[buf[u8]], name_value:own[buf[u8]], rollback_params:own[buf[u8]], rollback_value_sql:own[buf[u8]], bad_sql:own[buf[u8]])
+  v83:b1 = db_close dbh
+  v84:b1 = drop bad_sql
+  v85:b1 = drop rollback_value_sql
+  v86:b1 = drop rollback_params
+  v87:b1 = drop name_value
+  v88:b1 = drop name_sql
+  v89:b1 = drop value_sql
+  v90:b1 = drop row
+  v91:b1 = drop row_params
+  v92:b1 = drop inc_params
+  v93:b1 = drop row_stmt
+  v94:b1 = drop inc_stmt
+  v95:b1 = drop setup
+  return 0u8
+
+test t0
+  out 1u8
+end

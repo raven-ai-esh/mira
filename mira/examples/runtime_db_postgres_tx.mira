@@ -1,0 +1,86 @@
+module runtime.db.postgres.tx@1
+target native
+
+func transaction_commit_status
+ret u8
+eff db alloc
+cap db("postgresql://miratest:miratest@127.0.0.1:55432/mira_test")
+spec kind=db constraints=[postgres,transaction,prepared]
+block b0
+  v0:u64 = db_open postgresql://miratest:miratest@127.0.0.1:55432/mira_test
+  v1:own[buf[u8]] = buf_lit DROP\x20TABLE\x20IF\x20EXISTS\x20counters;\x20CREATE\x20TABLE\x20counters(id\x20INTEGER\x20PRIMARY\x20KEY,\x20value\x20INTEGER\x20NOT\x20NULL);\x20INSERT\x20INTO\x20counters(id,\x20value)\x20VALUES\x20(1,\x200);\x20
+  v2:b1 = db_exec v0 v1
+  v3:own[buf[u8]] = buf_lit UPDATE\x20counters\x20SET\x20value\x20=\x20value\x20+\x20$1\x20WHERE\x20id\x20=\x201;
+  v4:b1 = db_prepare v0 inc_counter v3
+  v5:b1 = db_begin v0
+  v6:own[buf[u8]] = buf_lit [2]
+  v7:b1 = db_exec_prepared v0 inc_counter v6
+  v8:own[buf[u8]] = buf_lit [3]
+  v9:b1 = db_exec_prepared v0 inc_counter v8
+  v10:b1 = db_commit v0
+  v11:own[buf[u8]] = buf_lit SELECT\x20value\x20FROM\x20counters\x20WHERE\x20id\x20=\x201;
+  v12:u32 = db_query_u32 v0 v11
+  v13:b1 = eq v12 5u32
+  branch v13 b1(v0, v1, v3, v6, v8, v11) b2(v0, v1, v3, v6, v8, v11)
+
+block b1(dbh:u64, setup:own[buf[u8]], stmt:own[buf[u8]], params_a:own[buf[u8]], params_b:own[buf[u8]], query:own[buf[u8]])
+  v14:b1 = db_close dbh
+  v15:b1 = drop query
+  v16:b1 = drop params_b
+  v17:b1 = drop params_a
+  v18:b1 = drop stmt
+  v19:b1 = drop setup
+  return 1u8
+
+block b2(dbh:u64, setup:own[buf[u8]], stmt:own[buf[u8]], params_a:own[buf[u8]], params_b:own[buf[u8]], query:own[buf[u8]])
+  v20:b1 = db_close dbh
+  v21:b1 = drop query
+  v22:b1 = drop params_b
+  v23:b1 = drop params_a
+  v24:b1 = drop stmt
+  v25:b1 = drop setup
+  return 0u8
+
+test t0
+  out 1u8
+end
+
+func transaction_rollback_status
+ret u8
+eff db alloc
+cap db("postgresql://miratest:miratest@127.0.0.1:55432/mira_test")
+spec kind=db constraints=[postgres,transaction,rollback]
+block b0
+  v0:u64 = db_open postgresql://miratest:miratest@127.0.0.1:55432/mira_test
+  v1:own[buf[u8]] = buf_lit DROP\x20TABLE\x20IF\x20EXISTS\x20counters;\x20CREATE\x20TABLE\x20counters(id\x20INTEGER\x20PRIMARY\x20KEY,\x20value\x20INTEGER\x20NOT\x20NULL);\x20INSERT\x20INTO\x20counters(id,\x20value)\x20VALUES\x20(1,\x207);\x20
+  v2:b1 = db_exec v0 v1
+  v3:own[buf[u8]] = buf_lit UPDATE\x20counters\x20SET\x20value\x20=\x20value\x20+\x20$1\x20WHERE\x20id\x20=\x201;
+  v4:b1 = db_prepare v0 inc_counter v3
+  v5:b1 = db_begin v0
+  v6:own[buf[u8]] = buf_lit [9]
+  v7:b1 = db_exec_prepared v0 inc_counter v6
+  v8:b1 = db_rollback v0
+  v9:own[buf[u8]] = buf_lit SELECT\x20value\x20FROM\x20counters\x20WHERE\x20id\x20=\x201;
+  v10:u32 = db_query_u32 v0 v9
+  v11:b1 = eq v10 7u32
+  branch v11 b1(v0, v1, v3, v6, v9) b2(v0, v1, v3, v6, v9)
+
+block b1(dbh:u64, setup:own[buf[u8]], stmt:own[buf[u8]], params:own[buf[u8]], query:own[buf[u8]])
+  v12:b1 = db_close dbh
+  v13:b1 = drop query
+  v14:b1 = drop params
+  v15:b1 = drop stmt
+  v16:b1 = drop setup
+  return 1u8
+
+block b2(dbh:u64, setup:own[buf[u8]], stmt:own[buf[u8]], params:own[buf[u8]], query:own[buf[u8]])
+  v17:b1 = db_close dbh
+  v18:b1 = drop query
+  v19:b1 = drop params
+  v20:b1 = drop stmt
+  v21:b1 = drop setup
+  return 0u8
+
+test t1
+  out 1u8
+end

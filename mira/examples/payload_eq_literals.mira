@@ -1,0 +1,62 @@
+module payload.eq@1
+target native
+
+type point = struct[x:i32,y:i32]
+type message = enum[idle,data[value:i32],pair[left:i32,right:i32]]
+
+func point_same
+arg a:point
+arg b:point
+ret b1
+eff pure
+spec kind=compare constraints=[pure,no_alloc]
+block b0
+  v0:b1 = eq a b
+  return v0
+test t0
+  in a=point[x=1i32,y=2i32]
+  in b=point[x=1i32,y=2i32]
+  out true
+test t1
+  in a=point[x=1i32,y=2i32]
+  in b=point[x=1i32,y=3i32]
+  out false
+end
+
+func message_same
+arg a:message
+arg b:message
+ret b1
+eff pure
+spec kind=compare constraints=[pure,no_alloc]
+block b0
+  v0:b1 = eq a b
+  return v0
+test t0
+  in a=message.data[value=7i32]
+  in b=message.data[value=7i32]
+  out true
+test t1
+  in a=message.data[value=7i32]
+  in b=message.idle
+  out false
+test t2
+  in a=message.pair[left=1i32,right=2i32]
+  in b=message.pair[left=1i32,right=3i32]
+  out false
+end
+
+func message_echo
+arg x:message
+ret message
+eff pure
+spec kind=identity constraints=[pure,no_alloc]
+block b0
+  return x
+test t0
+  in x=message.data[value=9i32]
+  out message.data[value=9i32]
+test t1
+  in x=message.pair[left=4i32,right=6i32]
+  out message.pair[left=4i32,right=6i32]
+end

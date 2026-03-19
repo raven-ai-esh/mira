@@ -1,0 +1,185 @@
+module runtime.stateful.db.cache.service@1
+target native
+
+func stateful_lookup_status
+ret u8
+eff db cache config env alloc net
+cap db("/tmp/mira_llm_1_2_state.sqlite")
+cap cache("/tmp/mira_llm_1_2_state.cache")
+cap net("127.0.0.1:1")
+cap config("cache_ttl_ms=30000,schema_version=20260318,max_idle=1")
+cap env("PATH")
+spec kind=http constraints=[stateful,db,cache,config,pool,row,result]
+block b0
+  v0:b1 = config_has schema_version
+  branch v0 b1() b12
+
+block b1
+  v1:b1 = env_has PATH
+  branch v1 b2() b12
+
+block b2
+  v2:u64 = db_pool_open /tmp/mira_llm_1_2_state.sqlite 1u32
+  v3:b1 = db_pool_set_max_idle v2 1u32
+  v4:u32 = db_pool_leased v2
+  v5:b1 = eq v4 0u32
+  branch v5 b3(v2) b13(v2)
+
+block b3(pool:u64)
+  v6:u64 = db_pool_acquire pool
+  v7:u64 = cache_open /tmp/mira_llm_1_2_state.cache
+  v8:own[buf[u8]] = buf_lit GET\x20/items/42\x20HTTP/1.1\r\nHost:\x20localhost\r\n\r\n
+  v9:view[buf[u8]] = view v8
+  v10:own[buf[u8]] = http_request_path v9
+  v11:view[buf[u8]] = view v10
+  v12:b1 = buf_eq_lit v11 /items/42
+  branch v12 b4(pool, v6, v7, v8, v10) b14(pool, v6, v7, v8, v10)
+
+block b4(pool:u64, dbh:u64, cacheh:u64, req:own[buf[u8]], path:own[buf[u8]])
+  v13:own[buf[u8]] = buf_lit item:42
+  v14:b1 = cache_del cacheh v13
+  v15:own[buf[u8]] = cache_get_buf cacheh v13
+  v16:view[buf[u8]] = view v15
+  v17:u32 = len v16
+  v18:b1 = eq v17 0u32
+  branch v18 b5(pool, dbh, cacheh, req, path, v13, v15) b15(pool, dbh, cacheh, req, path, v13, v15)
+
+block b5(pool:u64, dbh:u64, cacheh:u64, req:own[buf[u8]], path:own[buf[u8]], cache_key:own[buf[u8]], miss:own[buf[u8]])
+  v19:own[buf[u8]] = buf_lit DROP\x20TABLE\x20IF\x20EXISTS\x20items;\x20CREATE\x20TABLE\x20items(id\x20INTEGER\x20PRIMARY\x20KEY,\x20name\x20TEXT\x20NOT\x20NULL,\x20qty\x20INTEGER\x20NOT\x20NULL);\x20INSERT\x20INTO\x20items(id,\x20name,\x20qty)\x20VALUES\x20(42,\x20\x27widget\x27,\x207);\x20
+  v20:b1 = db_exec dbh v19
+  v21:own[buf[u8]] = buf_lit SELECT\x20json_object(\x27id\x27,\x20id,\x20\x27name\x27,\x20name,\x20\x27qty\x27,\x20qty)\x20FROM\x20items\x20WHERE\x20id\x20=\x2042;
+  v22:own[buf[u8]] = db_query_row dbh v21
+  v23:b1 = db_row_found v22
+  branch v23 b6(pool, dbh, cacheh, req, path, cache_key, miss, v19, v21, v22) b19(pool, dbh, cacheh, req, path, cache_key, miss, v19, v21, v22)
+
+block b6(pool:u64, dbh:u64, cacheh:u64, req:own[buf[u8]], path:own[buf[u8]], cache_key:own[buf[u8]], miss:own[buf[u8]], setup:own[buf[u8]], query:own[buf[u8]], row:own[buf[u8]])
+  v24:own[buf[u8]] = buf_lit SELECT\x20qty\x20FROM\x20items\x20WHERE\x20id\x20=\x2042;
+  v25:u32 = db_query_u32 dbh v24
+  v26:b1 = eq v25 7u32
+  branch v26 b7(pool, dbh, cacheh, req, path, cache_key, miss, setup, query, row, v24) b16(pool, dbh, cacheh, req, path, cache_key, miss, setup, query, row, v24)
+
+block b7(pool:u64, dbh:u64, cacheh:u64, req:own[buf[u8]], path:own[buf[u8]], cache_key:own[buf[u8]], miss:own[buf[u8]], setup:own[buf[u8]], query:own[buf[u8]], row:own[buf[u8]], qty_sql:own[buf[u8]])
+  v27:own[buf[u8]] = buf_lit SELECT\x20name\x20FROM\x20items\x20WHERE\x20id\x20=\x2042;
+  v28:own[buf[u8]] = db_query_buf dbh v27
+  v29:u32 = config_get_u32 cache_ttl_ms
+  v30:b1 = cache_set_buf_ttl cacheh cache_key v29 v28
+  v31:own[buf[u8]] = cache_get_buf cacheh cache_key
+  v32:view[buf[u8]] = view v31
+  v33:b1 = buf_eq_lit v32 widget
+  branch v33 b8(pool, dbh, cacheh, req, path, cache_key, miss, setup, query, row, qty_sql, v27, v28, v31) b17(pool, dbh, cacheh, req, path, cache_key, miss, setup, query, row, qty_sql, v27, v28, v31)
+
+block b8(pool:u64, dbh:u64, cacheh:u64, req:own[buf[u8]], path:own[buf[u8]], cache_key:own[buf[u8]], miss:own[buf[u8]], setup:own[buf[u8]], query:own[buf[u8]], row:own[buf[u8]], qty_sql:own[buf[u8]], name_sql:own[buf[u8]], name:own[buf[u8]], cached_name:own[buf[u8]])
+  v34:own[buf[u8]] = json_encode_arr name cached_name
+  v35:view[buf[u8]] = view v34
+  v36:u32 = len v35
+  v37:b1 = eq v36 0u32
+  branch v37 b18(pool, dbh, cacheh, req, path, cache_key, miss, setup, query, row, qty_sql, name_sql, name, cached_name, v34) b9(pool, dbh, cacheh, req, path, cache_key, miss, setup, query, row, qty_sql, name_sql, name, cached_name, v34)
+
+block b9(pool:u64, dbh:u64, cacheh:u64, req:own[buf[u8]], path:own[buf[u8]], cache_key:own[buf[u8]], miss:own[buf[u8]], setup:own[buf[u8]], query:own[buf[u8]], row:own[buf[u8]], qty_sql:own[buf[u8]], name_sql:own[buf[u8]], name:own[buf[u8]], cached_name:own[buf[u8]], encoded:own[buf[u8]])
+  v38:b1 = cache_close cacheh
+  v39:b1 = db_pool_release pool dbh
+  v40:b1 = db_pool_close pool
+  v41:b1 = drop encoded
+  v42:b1 = drop cached_name
+  v43:b1 = drop name
+  v44:b1 = drop name_sql
+  v45:b1 = drop qty_sql
+  v46:b1 = drop row
+  v47:b1 = drop query
+  v48:b1 = drop setup
+  v49:b1 = drop miss
+  v50:b1 = drop cache_key
+  v51:b1 = drop path
+  v52:b1 = drop req
+  return 1u8
+
+block b12
+  return 0u8
+
+block b13(pool:u64)
+  v53:b1 = db_pool_close pool
+  return 0u8
+
+block b14(pool:u64, dbh:u64, cacheh:u64, req:own[buf[u8]], path:own[buf[u8]])
+  v54:b1 = cache_close cacheh
+  v55:b1 = db_pool_release pool dbh
+  v56:b1 = db_pool_close pool
+  v57:b1 = drop path
+  v58:b1 = drop req
+  return 0u8
+
+block b15(pool:u64, dbh:u64, cacheh:u64, req:own[buf[u8]], path:own[buf[u8]], cache_key:own[buf[u8]], miss:own[buf[u8]])
+  v59:b1 = cache_close cacheh
+  v60:b1 = db_pool_release pool dbh
+  v61:b1 = db_pool_close pool
+  v62:b1 = drop miss
+  v63:b1 = drop cache_key
+  v64:b1 = drop path
+  v65:b1 = drop req
+  return 0u8
+
+block b19(pool:u64, dbh:u64, cacheh:u64, req:own[buf[u8]], path:own[buf[u8]], cache_key:own[buf[u8]], miss:own[buf[u8]], setup:own[buf[u8]], query:own[buf[u8]], row:own[buf[u8]])
+  v106:b1 = cache_close cacheh
+  v107:b1 = db_pool_release pool dbh
+  v108:b1 = db_pool_close pool
+  v109:b1 = drop row
+  v110:b1 = drop query
+  v111:b1 = drop setup
+  v112:b1 = drop miss
+  v113:b1 = drop cache_key
+  v114:b1 = drop path
+  v115:b1 = drop req
+  return 0u8
+
+block b16(pool:u64, dbh:u64, cacheh:u64, req:own[buf[u8]], path:own[buf[u8]], cache_key:own[buf[u8]], miss:own[buf[u8]], setup:own[buf[u8]], query:own[buf[u8]], row:own[buf[u8]], qty_sql:own[buf[u8]])
+  v66:b1 = cache_close cacheh
+  v67:b1 = db_pool_release pool dbh
+  v68:b1 = db_pool_close pool
+  v69:b1 = drop qty_sql
+  v70:b1 = drop row
+  v71:b1 = drop query
+  v72:b1 = drop setup
+  v73:b1 = drop miss
+  v74:b1 = drop cache_key
+  v75:b1 = drop path
+  v76:b1 = drop req
+  return 0u8
+
+block b17(pool:u64, dbh:u64, cacheh:u64, req:own[buf[u8]], path:own[buf[u8]], cache_key:own[buf[u8]], miss:own[buf[u8]], setup:own[buf[u8]], query:own[buf[u8]], row:own[buf[u8]], qty_sql:own[buf[u8]], name_sql:own[buf[u8]], name:own[buf[u8]], cached_name:own[buf[u8]])
+  v77:b1 = cache_close cacheh
+  v78:b1 = db_pool_release pool dbh
+  v79:b1 = db_pool_close pool
+  v80:b1 = drop cached_name
+  v81:b1 = drop name
+  v82:b1 = drop name_sql
+  v83:b1 = drop qty_sql
+  v84:b1 = drop row
+  v85:b1 = drop query
+  v86:b1 = drop setup
+  v87:b1 = drop miss
+  v88:b1 = drop cache_key
+  v89:b1 = drop path
+  v90:b1 = drop req
+  return 0u8
+
+block b18(pool:u64, dbh:u64, cacheh:u64, req:own[buf[u8]], path:own[buf[u8]], cache_key:own[buf[u8]], miss:own[buf[u8]], setup:own[buf[u8]], query:own[buf[u8]], row:own[buf[u8]], qty_sql:own[buf[u8]], name_sql:own[buf[u8]], name:own[buf[u8]], cached_name:own[buf[u8]], encoded:own[buf[u8]])
+  v91:b1 = cache_close cacheh
+  v92:b1 = db_pool_release pool dbh
+  v93:b1 = db_pool_close pool
+  v94:b1 = drop encoded
+  v95:b1 = drop cached_name
+  v96:b1 = drop name
+  v97:b1 = drop name_sql
+  v98:b1 = drop qty_sql
+  v99:b1 = drop row
+  v100:b1 = drop query
+  v101:b1 = drop setup
+  v102:b1 = drop miss
+  v103:b1 = drop cache_key
+  v104:b1 = drop path
+  v105:b1 = drop req
+  return 0u8
+
+test t0
+  out 1u8
+end

@@ -1,0 +1,71 @@
+module runtime.tls.auth.gateway@1
+target native
+
+func serve_tls_secure_once
+ret u8
+eff net alloc
+cap net("127.0.0.1:39583")
+cap tls("cert=/tmp/mira_tls_server.crt,key=/tmp/mira_tls_server.key,request_timeout_ms=5000,session_timeout_ms=2000,shutdown_grace_ms=250")
+spec kind=http constraints=[tls,server,router,middleware,auth]
+
+block b0
+  v0:u64 = tls_listen
+  v1:u32 = tls_server_config_u32 request_timeout_ms
+  v2:b1 = listener_set_timeout_ms v0 v1
+  v3:u32 = tls_server_config_u32 shutdown_grace_ms
+  v4:b1 = listener_set_shutdown_grace_ms v0 v3
+  v5:u64 = http_session_accept v0
+  v6:u32 = tls_server_config_u32 session_timeout_ms
+  v7:b1 = session_set_timeout_ms v5 v6
+  v8:own[buf[u8]] = tls_server_config_buf cert
+  v9:own[buf[u8]] = tls_server_config_buf key
+  v10:own[buf[u8]] = http_session_request v5
+  v11:view[buf[u8]] = view v10
+  v12:b1 = http_method_eq v11 GET
+  branch v12 b1(v0, v5, v8, v9, v10, v11) b5(v0, v5, v8, v9, v10)
+
+block b1(listener:u64, session:u64, cert_buf:own[buf[u8]], key_buf:own[buf[u8]], req:own[buf[u8]], req_view:view[buf[u8]])
+  v13:b1 = http_path_eq req_view /secure
+  branch v13 b2(listener, session, cert_buf, key_buf, req, req_view) b5(listener, session, cert_buf, key_buf, req)
+
+block b2(listener:u64, session:u64, cert_buf:own[buf[u8]], key_buf:own[buf[u8]], req:own[buf[u8]], req_view:view[buf[u8]])
+  v14:own[buf[u8]] = http_header req_view Authorization
+  v15:view[buf[u8]] = view v14
+  v16:b1 = buf_eq_lit v15 token-42
+  branch v16 b3(listener, session, cert_buf, key_buf, req, v14) b4(listener, session, cert_buf, key_buf, req, v14)
+
+block b3(listener:u64, session:u64, cert_buf:own[buf[u8]], key_buf:own[buf[u8]], req:own[buf[u8]], auth:own[buf[u8]])
+  v17:own[buf[u8]] = buf_lit \x7b\x22secure\x22:true\x7d
+  v18:b1 = http_session_write_json session 200u32 v17
+  v19:b1 = http_session_close session
+  v20:b1 = net_close listener
+  v21:b1 = drop v17
+  v22:b1 = drop auth
+  v23:b1 = drop req
+  v24:b1 = drop key_buf
+  v25:b1 = drop cert_buf
+  return 1u8
+
+block b4(listener:u64, session:u64, cert_buf:own[buf[u8]], key_buf:own[buf[u8]], req:own[buf[u8]], auth:own[buf[u8]])
+  v26:own[buf[u8]] = buf_lit DENIED
+  v27:b1 = http_session_write_text session 403u32 v26
+  v28:b1 = http_session_close session
+  v29:b1 = net_close listener
+  v30:b1 = drop v26
+  v31:b1 = drop auth
+  v32:b1 = drop req
+  v33:b1 = drop key_buf
+  v34:b1 = drop cert_buf
+  return 0u8
+
+block b5(listener:u64, session:u64, cert_buf:own[buf[u8]], key_buf:own[buf[u8]], req:own[buf[u8]])
+  v35:own[buf[u8]] = buf_lit MISSING
+  v36:b1 = http_session_write_text session 404u32 v35
+  v37:b1 = http_session_close session
+  v38:b1 = net_close listener
+  v39:b1 = drop v35
+  v40:b1 = drop req
+  v41:b1 = drop key_buf
+  v42:b1 = drop cert_buf
+  return 0u8
+end

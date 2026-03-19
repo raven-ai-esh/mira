@@ -1,0 +1,27 @@
+module core.math@1
+target native
+
+func fib_iter
+arg n:i32
+ret i64
+eff pure
+spec kind=recurrence domain=n op=fib constraints=[pure,no_alloc]
+block b0
+  v0:b1 = le n 1i32
+  branch v0 b1(n) b2(0i64, 1i64, 2i32, n)
+block b1(value:i32)
+  v1:i64 = sext i64 value
+  return v1
+block b2(a:i64, b:i64, i:i32, limit:i32)
+  v2:b1 = le i limit
+  branch v2 b3(a, b, i, limit) b4(b)
+block b3(a:i64, b:i64, i:i32, limit:i32)
+  v3:i64 = add a b
+  v4:i32 = add i 1i32
+  jump b2(b, v3, v4, limit)
+block b4(result:i64)
+  return result
+test t0
+  in n=10i32
+  out 55i64
+end

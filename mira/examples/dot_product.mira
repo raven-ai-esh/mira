@@ -1,0 +1,35 @@
+module vec.math@1
+target native
+
+func dot_product
+arg xs:span[i32]
+arg ys:span[i32]
+ret i64
+eff pure
+spec kind=reduce domain=xs,ys op=add(mul) constraints=[pure,no_alloc]
+block b0
+  v0:i64 = const 0i64
+  v1:u32 = len xs
+  v2:u32 = len ys
+  v3:b1 = eq v1 v2
+  branch v3 b1(v0, 0u32, v1, xs, ys) b4(v0)
+block b1(acc:i64, i:u32, n:u32, xs:span[i32], ys:span[i32])
+  v4:b1 = lt i n
+  branch v4 b2(acc, i, n, xs, ys) b3(acc)
+block b2(acc:i64, i:u32, n:u32, xs:span[i32], ys:span[i32])
+  v5:i32 = load xs i
+  v6:i32 = load ys i
+  v7:i32 = mul v5 v6
+  v8:i64 = sext i64 v7
+  v9:i64 = add acc v8
+  v10:u32 = add i 1u32
+  jump b1(v9, v10, n, xs, ys)
+block b3(acc:i64)
+  return acc
+block b4(acc:i64)
+  return acc
+test t0
+  in xs=[1,2,3]
+  in ys=[4,5,6]
+  out 32i64
+end

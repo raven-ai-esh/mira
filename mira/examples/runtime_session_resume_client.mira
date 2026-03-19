@@ -1,0 +1,36 @@
+module runtime.session.resume.client@1
+target native
+
+func anchor_ok
+ret u8
+eff alloc
+block b0
+  return 1u8
+test t0
+  out 1u8
+end
+
+func resume_client_once
+ret u8
+eff net alloc
+cap net("127.0.0.1:39622")
+spec kind=realtime constraints=[client,resume,reconnect,heartbeat]
+block b0
+  v0:u64 = net_session_open
+  v1:u64 = session_resume_id v0
+  v2:own[buf[u8]] = buf_lit HELO
+  v3:b1 = session_write_chunk v0 v2
+  v4:b1 = session_flush v0
+  v5:b1 = session_reconnect v0
+  v6:own[buf[u8]] = buf_lit PING
+  v7:b1 = session_heartbeat v0 v6
+  v8:own[buf[u8]] = session_read_chunk v0 2u32
+  v9:view[buf[u8]] = view v8
+  v10:u8 = load v9 0u32
+  v11:b1 = session_alive v0
+  v12:b1 = net_close v0
+  v13:b1 = drop v8
+  v14:b1 = drop v6
+  v15:b1 = drop v2
+  return v10
+end

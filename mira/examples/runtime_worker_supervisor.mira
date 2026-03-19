@@ -1,0 +1,92 @@
+module runtime.worker.supervisor@1
+target native
+
+func run_worker_supervisor
+ret u8
+eff spawn
+spec kind=runtime constraints=[supervisor,recovery,circuit,backpressure]
+block b0
+  v0:u64 = backpressure_open 1u32
+  v1:b1 = backpressure_acquire v0
+  branch v1 b1(v0) b9(v0)
+
+block b1(bp:u64)
+  v2:b1 = backpressure_saturated bp
+  branch v2 b2(bp) b9(bp)
+
+block b2(bp:u64)
+  v3:b1 = backpressure_acquire bp
+  branch v3 b9(bp) b3(bp)
+
+block b3(bp:u64)
+  v4:b1 = backpressure_release bp
+  branch v4 b4(bp) b9(bp)
+
+block b4(bp:u64)
+  v5:b1 = backpressure_saturated bp
+  branch v5 b9(bp) b5(bp)
+
+block b5(bp:u64)
+  v6:u64 = circuit_open 2u32 10u32
+  v7:b1 = circuit_allow v6
+  branch v7 b6(bp, v6) b10(bp, v6)
+
+block b6(bp:u64, circuit:u64)
+  v8:b1 = circuit_record_failure circuit
+  v9:b1 = circuit_allow circuit
+  branch v9 b7(bp, circuit) b10(bp, circuit)
+
+block b7(bp:u64, circuit:u64)
+  v10:b1 = circuit_record_failure circuit
+  v11:u32 = circuit_state circuit
+  v12:b1 = eq v11 1u32
+  branch v12 b8(bp, circuit) b10(bp, circuit)
+
+block b8(bp:u64, circuit:u64)
+  v13:b1 = circuit_allow circuit
+  branch v13 b10(bp, circuit) b11(bp, circuit)
+
+block b11(bp:u64, circuit:u64)
+  v14:u64 = supervisor_open 3u32 2u32
+  v15:b1 = supervisor_record_failure v14 500u32
+  v16:b1 = supervisor_should_restart v14
+  branch v16 b12(bp, circuit, v14) b17(bp, circuit, v14)
+
+block b12(bp:u64, circuit:u64, sup:u64)
+  v17:b1 = supervisor_degraded sup
+  branch v17 b17(bp, circuit, sup) b13(bp, circuit, sup)
+
+block b13(bp:u64, circuit:u64, sup:u64)
+  v18:b1 = supervisor_record_failure sup 503u32
+  v19:b1 = supervisor_degraded sup
+  branch v19 b15(bp, circuit, sup) b17(bp, circuit, sup)
+
+block b15(bp:u64, circuit:u64, sup:u64)
+  v21:b1 = supervisor_record_recovery sup
+  v22:b1 = supervisor_degraded sup
+  branch v22 b17(bp, circuit, sup) b16(bp, circuit, sup)
+
+block b16(bp:u64, circuit:u64, sup:u64)
+  v23:b1 = supervisor_close sup
+  v24:b1 = circuit_close circuit
+  v25:b1 = backpressure_close bp
+  return 1u8
+
+block b9(bp:u64)
+  v26:b1 = backpressure_close bp
+  return 0u8
+
+block b10(bp:u64, circuit:u64)
+  v27:b1 = circuit_close circuit
+  v28:b1 = backpressure_close bp
+  return 0u8
+
+block b17(bp:u64, circuit:u64, sup:u64)
+  v29:b1 = supervisor_close sup
+  v30:b1 = circuit_close circuit
+  v31:b1 = backpressure_close bp
+  return 0u8
+
+test t0
+  out 1u8
+end

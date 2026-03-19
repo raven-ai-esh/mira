@@ -1,0 +1,42 @@
+module runtime.json.extract@1
+target native
+
+func parse_json_scalars_and_string
+ret u8
+eff alloc
+spec kind=json constraints=[json,bytes,fields]
+block b0
+  v0:own[buf[u8]] = buf_lit \x7b\x22n\x22:7,\x22b\x22:true,\x22s\x22:\x22ok\x22\x7d
+  v1:view[buf[u8]] = view v0
+  v2:u32 = json_get_u32 v1 n
+  v3:b1 = eq v2 7u32
+  branch v3 b1(v0, v1) b4(v0)
+
+block b1(src:own[buf[u8]], src_view:view[buf[u8]])
+  v4:b1 = json_get_bool src_view b
+  branch v4 b2(src, src_view) b4(src)
+
+block b2(src:own[buf[u8]], src_view:view[buf[u8]])
+  v5:own[buf[u8]] = json_get_buf src_view s
+  v6:view[buf[u8]] = view v5
+  v7:u8 = load v6 1u32
+  v8:b1 = eq v7 107u8
+  branch v8 b3(src, v5) b5(src, v5)
+
+block b3(src:own[buf[u8]], out:own[buf[u8]])
+  v9:b1 = drop out
+  v10:b1 = drop src
+  return 1u8
+
+block b4(src:own[buf[u8]])
+  v11:b1 = drop src
+  return 0u8
+
+block b5(src:own[buf[u8]], out:own[buf[u8]])
+  v12:b1 = drop out
+  v13:b1 = drop src
+  return 0u8
+
+test t0
+  out 1u8
+end

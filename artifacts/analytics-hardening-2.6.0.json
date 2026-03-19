@@ -1,0 +1,348 @@
+{
+  "release": "2.6.0",
+  "profile_set": "analytics",
+  "ok": true,
+  "profiles": [
+    {
+      "name": "production_analytics_platform",
+      "source": "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_production_analytics_platform.mira",
+      "artifact": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/production_analytics_platform.mirb3",
+      "missing_tokens": [],
+      "checks": [
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "check",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_production_analytics_platform.mira"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"path\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_production_analytics_platform.mira\",\"module\":\"runtime.production.analytics.platform@1\",\"functions\":[\"production_analytics_platform_status\",\"analytics_worker_batch_status\",\"analytics_checkpoint_recovery_status\",\"process_analytics_job\",\"analytics_worker_throughput_status\",\"analytics_failure_recovery_status\"]}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac check /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_production_analytics_platform.mira`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "test",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_production_analytics_platform.mira"
+          ],
+          "ok": true,
+          "stdout": "ok\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac test /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_production_analytics_platform.mira`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "emit-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_production_analytics_platform.mira",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/production_analytics_platform.mirb3"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"output\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/production_analytics_platform.mirb3\"}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac emit-binary /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_production_analytics_platform.mira /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/production_analytics_platform.mirb3`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "check-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/production_analytics_platform.mirb3"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"path\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/production_analytics_platform.mirb3\",\"module\":\"runtime.production.analytics.platform@1\",\"functions\":[\"production_analytics_platform_status\",\"analytics_worker_batch_status\",\"analytics_checkpoint_recovery_status\",\"process_analytics_job\",\"analytics_worker_throughput_status\",\"analytics_failure_recovery_status\"],\"artifact\":\"lowered\"}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac check-binary /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/production_analytics_platform.mirb3`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "test-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/production_analytics_platform.mirb3"
+          ],
+          "ok": true,
+          "stdout": "portable bytecode tests passed: 5/5\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac test-binary /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/production_analytics_platform.mirb3`\n",
+          "returncode": 0
+        }
+      ],
+      "ok": true
+    },
+    {
+      "name": "aggregation_worker_service",
+      "source": "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_aggregation_worker_service.mira",
+      "artifact": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/aggregation_worker_service.mirb3",
+      "missing_tokens": [],
+      "checks": [
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "check",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_aggregation_worker_service.mira"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"path\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_aggregation_worker_service.mira\",\"module\":\"runtime.aggregation.worker.service@1\",\"functions\":[\"aggregate_two_jobs\"]}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac check /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_aggregation_worker_service.mira`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "test",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_aggregation_worker_service.mira"
+          ],
+          "ok": true,
+          "stdout": "ok\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac test /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_aggregation_worker_service.mira`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "emit-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_aggregation_worker_service.mira",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/aggregation_worker_service.mirb3"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"output\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/aggregation_worker_service.mirb3\"}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac emit-binary /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_aggregation_worker_service.mira /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/aggregation_worker_service.mirb3`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "check-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/aggregation_worker_service.mirb3"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"path\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/aggregation_worker_service.mirb3\",\"module\":\"runtime.aggregation.worker.service@1\",\"functions\":[\"aggregate_two_jobs\"],\"artifact\":\"lowered\"}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac check-binary /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/aggregation_worker_service.mirb3`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "test-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/aggregation_worker_service.mirb3"
+          ],
+          "ok": true,
+          "stdout": "portable bytecode tests passed: 1/1\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac test-binary /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/aggregation_worker_service.mirb3`\n",
+          "returncode": 0
+        }
+      ],
+      "ok": true
+    },
+    {
+      "name": "distributed_analytics_cluster",
+      "source": "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_distributed_analytics_cluster.mira",
+      "artifact": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/distributed_analytics_cluster.mirb3",
+      "missing_tokens": [],
+      "checks": [
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "check",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_distributed_analytics_cluster.mira"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"path\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_distributed_analytics_cluster.mira\",\"module\":\"runtime.distributed.analytics.cluster@1\",\"functions\":[\"replay_cluster_checkpoint\"]}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac check /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_distributed_analytics_cluster.mira`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "test",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_distributed_analytics_cluster.mira"
+          ],
+          "ok": true,
+          "stdout": "ok\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac test /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_distributed_analytics_cluster.mira`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "emit-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_distributed_analytics_cluster.mira",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/distributed_analytics_cluster.mirb3"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"output\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/distributed_analytics_cluster.mirb3\"}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac emit-binary /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_distributed_analytics_cluster.mira /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/distributed_analytics_cluster.mirb3`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "check-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/distributed_analytics_cluster.mirb3"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"path\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/distributed_analytics_cluster.mirb3\",\"module\":\"runtime.distributed.analytics.cluster@1\",\"functions\":[\"replay_cluster_checkpoint\"],\"artifact\":\"lowered\"}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac check-binary /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/distributed_analytics_cluster.mirb3`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "test-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/distributed_analytics_cluster.mirb3"
+          ],
+          "ok": true,
+          "stdout": "portable bytecode tests passed: 1/1\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac test-binary /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/distributed_analytics_cluster.mirb3`\n",
+          "returncode": 0
+        }
+      ],
+      "ok": true
+    },
+    {
+      "name": "failover_rebalance_service",
+      "source": "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_failover_rebalance_service.mira",
+      "artifact": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/failover_rebalance_service.mirb3",
+      "missing_tokens": [],
+      "checks": [
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "check",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_failover_rebalance_service.mira"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"path\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_failover_rebalance_service.mira\",\"module\":\"runtime.failover.rebalance.service@1\",\"functions\":[\"rebalance_without_duplicate_work\"]}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac check /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_failover_rebalance_service.mira`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "test",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_failover_rebalance_service.mira"
+          ],
+          "ok": true,
+          "stdout": "ok\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac test /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_failover_rebalance_service.mira`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "emit-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_failover_rebalance_service.mira",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/failover_rebalance_service.mirb3"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"output\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/failover_rebalance_service.mirb3\"}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac emit-binary /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_failover_rebalance_service.mira /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/failover_rebalance_service.mirb3`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "check-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/failover_rebalance_service.mirb3"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"path\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/failover_rebalance_service.mirb3\",\"module\":\"runtime.failover.rebalance.service@1\",\"functions\":[\"rebalance_without_duplicate_work\"],\"artifact\":\"lowered\"}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac check-binary /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/failover_rebalance_service.mirb3`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "test-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/failover_rebalance_service.mirb3"
+          ],
+          "ok": true,
+          "stdout": "portable bytecode tests passed: 1/1\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac test-binary /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/analytics-conformance-artifacts/failover_rebalance_service.mirb3`\n",
+          "returncode": 0
+        }
+      ],
+      "ok": true
+    }
+  ],
+  "failures": []
+}

@@ -1,0 +1,70 @@
+module runtime.redis.client@1
+target native
+
+func ping_status
+ret u8
+eff net alloc
+cap net("127.0.0.1:6389")
+spec kind=cache constraints=[redis,ping,resp]
+block b0
+  v0:own[buf[u8]] = buf_lit *1\r\n$4\r\nPING\r\n*1\r\n$4\r\nQUIT\r\n
+  v1:own[buf[u8]] = net_exchange_all v0
+  v2:view[buf[u8]] = view v1
+  v3:b1 = buf_contains_lit v2 PONG
+  branch v3 b1(v0, v1) b2(v0, v1)
+
+block b1(req:own[buf[u8]], resp:own[buf[u8]])
+  v4:b1 = drop resp
+  v5:b1 = drop req
+  return 1u8
+
+block b2(req:own[buf[u8]], resp:own[buf[u8]])
+  v6:b1 = drop resp
+  v7:b1 = drop req
+  return 0u8
+
+test t0
+  out 1u8
+end
+
+func set_get_status
+ret u8
+eff net alloc
+cap net("127.0.0.1:6389")
+spec kind=cache constraints=[redis,set,get,resp]
+block b0
+  v0:own[buf[u8]] = buf_lit *3\r\n$3\r\nSET\r\n$4\r\nname\r\n$4\r\negor\r\n*1\r\n$4\r\nQUIT\r\n
+  v1:own[buf[u8]] = net_exchange_all v0
+  v2:view[buf[u8]] = view v1
+  v3:b1 = buf_contains_lit v2 OK
+  branch v3 b1(v0, v1) b2(v0, v1)
+
+block b1(set_req:own[buf[u8]], set_resp:own[buf[u8]])
+  v4:own[buf[u8]] = buf_lit *2\r\n$3\r\nGET\r\n$4\r\nname\r\n*1\r\n$4\r\nQUIT\r\n
+  v5:own[buf[u8]] = net_exchange_all v4
+  v6:view[buf[u8]] = view v5
+  v7:b1 = buf_contains_lit v6 egor
+  branch v7 b3(set_req, set_resp, v4, v5) b4(set_req, set_resp, v4, v5)
+
+block b2(set_req:own[buf[u8]], set_resp:own[buf[u8]])
+  v8:b1 = drop set_resp
+  v9:b1 = drop set_req
+  return 0u8
+
+block b3(set_req:own[buf[u8]], set_resp:own[buf[u8]], get_req:own[buf[u8]], get_resp:own[buf[u8]])
+  v10:b1 = drop get_resp
+  v11:b1 = drop get_req
+  v12:b1 = drop set_resp
+  v13:b1 = drop set_req
+  return 1u8
+
+block b4(set_req:own[buf[u8]], set_resp:own[buf[u8]], get_req:own[buf[u8]], get_resp:own[buf[u8]])
+  v14:b1 = drop get_resp
+  v15:b1 = drop get_req
+  v16:b1 = drop set_resp
+  v17:b1 = drop set_req
+  return 0u8
+
+test t1
+  out 1u8
+end

@@ -1,0 +1,46 @@
+module runtime.realtime.gateway.service@1
+target native
+
+func anchor_ok
+ret u8
+eff alloc
+block b0
+  return 1u8
+test t0
+  out 1u8
+end
+
+func serve_gateway_once
+ret u8
+eff net alloc
+cap net("127.0.0.1:39621")
+spec kind=realtime constraints=[transport,session,heartbeat,backpressure,stream]
+block b0
+  v0:u64 = net_listen
+  v1:u64 = net_accept v0
+  v2:b1 = session_alive v1
+  branch v2 b1(v0, v1) b2(v0, v1)
+
+block b1(listener:u64, session:u64)
+  v3:own[buf[u8]] = session_read_chunk session 4u32
+  v4:view[buf[u8]] = view v3
+  v5:u8 = load v4 0u32
+  v6:own[buf[u8]] = buf_lit ACK!
+  v7:b1 = session_write_chunk session v6
+  v8:u32 = session_backpressure session
+  v9:b1 = session_backpressure_wait session 8u32
+  v10:own[buf[u8]] = buf_lit HB
+  v11:b1 = session_heartbeat session v10
+  v12:b1 = session_flush session
+  v13:b1 = net_close session
+  v14:b1 = net_close listener
+  v15:b1 = drop v10
+  v16:b1 = drop v6
+  v17:b1 = drop v3
+  return v5
+
+block b2(listener:u64, session:u64)
+  v18:b1 = net_close session
+  v19:b1 = net_close listener
+  return 0u8
+end

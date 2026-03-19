@@ -1,0 +1,42 @@
+module runtime.http.route@1
+target native
+
+func route_health
+ret u8
+eff net alloc
+cap net("127.0.0.1:18080")
+spec kind=http constraints=[http,router,bytes]
+block b0
+  v0:own[buf[u8]] = buf_lit GET\x20/health?probe=1\x20HTTP/1.1\r\nHost:\x20localhost\r\n\r\n
+  v1:view[buf[u8]] = view v0
+  v2:own[buf[u8]] = http_request_method v1
+  v3:view[buf[u8]] = view v2
+  v4:b1 = buf_eq_lit v3 GET
+  branch v4 b1(v0, v2, v1) b4(v0, v2)
+
+block b1(req:own[buf[u8]], method:own[buf[u8]], req_view:view[buf[u8]])
+  v5:own[buf[u8]] = http_request_path req_view
+  v6:view[buf[u8]] = view v5
+  v7:b1 = buf_eq_lit v6 /health
+  branch v7 b2(req, method, v5) b3(req, method, v5)
+
+block b2(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]])
+  v8:b1 = drop path
+  v9:b1 = drop method
+  v10:b1 = drop req
+  return 1u8
+
+block b3(req:own[buf[u8]], method:own[buf[u8]], path:own[buf[u8]])
+  v11:b1 = drop path
+  v12:b1 = drop method
+  v13:b1 = drop req
+  return 0u8
+
+block b4(req:own[buf[u8]], method:own[buf[u8]])
+  v14:b1 = drop method
+  v15:b1 = drop req
+  return 0u8
+
+test t0
+  out 1u8
+end

@@ -1,0 +1,61 @@
+module runtime.agent.worker.queue.service@1
+target native
+
+func process_job
+arg job:u32
+ret u32
+eff spawn clock
+cap clock("monotonic")
+spec kind=runtime constraints=[worker,job,channel]
+block b0
+  v0:b1 = rt_cancelled
+  branch v0 b1(job) b2(job)
+
+block b1(job:u32)
+  return 0u32
+
+block b2(job:u32)
+  v1:b1 = task_sleep_ms 1u32
+  v2:u32 = add job job
+  v3:u32 = add v2 job
+  return v3
+end
+
+func maintained_agent_worker_queue_status
+ret u32
+eff service spawn clock
+cap service("agent-platform-worker")
+cap clock("monotonic")
+spec kind=service constraints=[agent_platform,maintained,worker_queue,portable_native]
+block b0
+  v0:u64 = service_open
+  v1:u64 = rt_open 2u32
+  v2:u64 = chan_open_u32 4u32
+  v3:b1 = chan_send_u32 v2 5u32
+  v4:b1 = chan_send_u32 v2 7u32
+  v5:b1 = chan_send_u32 v2 11u32
+  v6:u32 = chan_recv_u32 v2
+  v7:u32 = chan_recv_u32 v2
+  v8:u32 = chan_recv_u32 v2
+  v9:u64 = rt_spawn_u32 v1 process_job v6
+  v10:u64 = rt_spawn_u32 v1 process_job v7
+  v11:u64 = rt_spawn_u32 v1 process_job v8
+  v12:u32 = rt_join_u32 v9
+  v13:u32 = rt_join_u32 v10
+  v14:u32 = rt_join_u32 v11
+  v15:u32 = add v12 v13
+  v16:u32 = add v15 v14
+  v17:u32 = service_health_status v0
+  v18:u32 = add v16 v17
+  v19:b1 = rt_task_close v9
+  v20:b1 = rt_task_close v10
+  v21:b1 = rt_task_close v11
+  v22:b1 = chan_close v2
+  v23:b1 = rt_shutdown v1 20u32
+  v24:b1 = rt_close v1
+  v25:b1 = service_close v0
+  return v18
+
+test t0
+  out 269u32
+end

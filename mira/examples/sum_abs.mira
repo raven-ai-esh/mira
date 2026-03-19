@@ -1,0 +1,28 @@
+module vec.math@1
+target native
+
+func sum_abs
+arg xs:span[i32]
+ret i64
+eff pure
+spec kind=reduce domain=xs op=add(abs) constraints=[pure,no_alloc]
+block b0
+  v0:i64 = const 0i64
+  v1:u32 = len xs
+  jump b1(v0, 0u32, v1, xs)
+block b1(acc:i64, i:u32, n:u32, xs:span[i32])
+  v2:b1 = lt i n
+  branch v2 b2(acc, i, n, xs) b3(acc)
+block b2(acc:i64, i:u32, n:u32, xs:span[i32])
+  v3:i32 = load xs i
+  v4:i32 = abs v3
+  v5:i64 = sext i64 v4
+  v6:i64 = add acc v5
+  v7:u32 = add i 1u32
+  jump b1(v6, v7, n, xs)
+block b3(acc:i64)
+  return acc
+test t0
+  in xs=[-1,2,-3]
+  out 6i64
+end

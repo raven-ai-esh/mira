@@ -1,0 +1,27 @@
+module runtime.spawn@1
+target native
+
+func spawn_true_status
+ret i32
+eff spawn
+cap spawn("true,false")
+spec kind=spawn constraints=[spawn,no_args]
+block b0
+  v0:i32 = spawn_call true
+  return v0
+test t0
+  out 0i32
+end
+
+func spawn_false_nonzero
+ret b1
+eff spawn
+cap spawn("true,false")
+spec kind=spawn constraints=[spawn,no_args]
+block b0
+  v0:i32 = spawn_call false
+  v1:b1 = eq v0 1i32
+  return v1
+test t0
+  out true
+end

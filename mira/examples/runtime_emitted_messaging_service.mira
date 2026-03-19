@@ -1,0 +1,41 @@
+module runtime.emitted.messaging.service@1
+target native
+
+func emitted_messaging_request_batch
+ret u32
+eff service net alloc
+cap service("emitted-messaging-api")
+cap net("127.0.0.1:39582")
+spec kind=service constraints=[messaging,delivery,fanout,portable_native]
+block b0
+  v0:u64 = service_open
+  v1:own[buf[u8]] = buf_lit POST\x20/deliver\x20HTTP/1.1\r\nHost:\x20localhost\r\nContent-Type:\x20application/json\r\n\r\n{\x22fanout\x22:42}
+  v2:b1 = service_route v1 POST /deliver
+  v3:own[buf[u8]] = http_body v1
+  v4:u32 = json_get_u32 v3 fanout
+  v5:b1 = eq v4 42u32
+  branch v2 b1(v0, v1, v3, v4, v5) b4(v0, v1, v3)
+
+block b1(svc:u64, req:own[buf[u8]], body:own[buf[u8]], fanout:u32, body_ok:b1)
+  branch body_ok b3(svc, req, body, fanout) b4(svc, req, body)
+
+block b3(svc:u64, req:own[buf[u8]], body:own[buf[u8]], fanout:u32)
+  v8:u32 = service_health_status svc
+  jump b5(svc, req, body, fanout, v8)
+
+block b4(svc:u64, req:own[buf[u8]], body:own[buf[u8]])
+  v10:b1 = service_close svc
+  v11:b1 = drop body
+  v12:b1 = drop req
+  return 0u32
+
+block b5(svc:u64, req:own[buf[u8]], body:own[buf[u8]], fanout:u32, health:u32)
+  v13:u32 = add fanout health
+  v14:b1 = service_close svc
+  v15:b1 = drop body
+  v16:b1 = drop req
+  return v13
+
+test t0
+  out 242u32
+end

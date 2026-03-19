@@ -1,0 +1,182 @@
+[
+  {
+    "runtime": "go",
+    "workload": "messaging_transport",
+    "command": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/advanced-backend-bench/backend_bench_go messaging_transport 100 1 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/messaging_transport-go.json",
+    "elapsed_ms": 11.236190795898438,
+    "max_rss_bytes": 5947392,
+    "stdout": "{\n  \"workload\": \"messaging_transport\",\n  \"samples_ns\": [\n    1070250,\n    419166,\n    423542,\n    410875,\n    412833\n  ],\n  \"median_ns\": 419166,\n  \"p95_ns\": 423542,\n  \"p99_ns\": 423542,\n  \"per_call_ns\": 4191.66,\n  \"units_per_second\": 238568.96790293106,\n  \"iterations\": 100,\n  \"unit_work\": 1\n}\n",
+    "stderr": "        0.00 real         0.00 user         0.00 sys\n             5947392  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 437  page reclaims\n                 113  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   0  voluntary context switches\n                 121  involuntary context switches\n            75686126  instructions retired\n            23363518  cycles elapsed\n             4129176  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "rust",
+    "workload": "messaging_transport",
+    "command": "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/benchmarks/backend_workloads/rust/target/release/mira-backend-bench messaging_transport 100 1 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/messaging_transport-rust.json",
+    "elapsed_ms": 6.917715072631836,
+    "max_rss_bytes": 1638400,
+    "stdout": "{\n  \"workload\": \"messaging_transport\",\n  \"samples_ns\": [436334,429208,438333,430917,433792],\n  \"median_ns\": 433792,\n  \"p95_ns\": 436334,\n  \"p99_ns\": 436334,\n  \"per_call_ns\": 4337.920,\n  \"units_per_second\": 230525.229,\n  \"iterations\": 100,\n  \"unit_work\": 1\n}\n",
+    "stderr": "        0.00 real         0.00 user         0.00 sys\n             1638400  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 259  page reclaims\n                   0  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   0  voluntary context switches\n                   4  involuntary context switches\n            64734881  instructions retired\n            15743763  cycles elapsed\n             1032456  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "mira_default",
+    "workload": "messaging_transport",
+    "command": "cargo run --release --manifest-path /Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml -- bench-source-default /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_messaging_benchmark.mira messaging_transport_bench 100 1 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/messaging_transport-mira_default.json",
+    "elapsed_ms": 844.5539474487305,
+    "max_rss_bytes": 101793792,
+    "stdout": "{\"results\":[{\"case\":\"messaging_transport_bench\",\"file\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_messaging_benchmark.mira\",\"iterations\":100,\"unit_work\":1,\"samples_ns\":[65000,65000,62000,62000,62000],\"median_ns\":62000,\"p95_ns\":65000,\"p99_ns\":65000,\"per_call_ns\":620.000,\"units_per_second\":1612903.226}]}\n",
+    "stderr": "    Finished `release` profile [optimized] target(s) in 0.01s\n     Running `mirac/target/release/mirac bench-source-default /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_messaging_benchmark.mira messaging_transport_bench 100 1 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/messaging_transport-mira_default.json`\n        0.83 real         0.68 user         0.07 sys\n           101793792  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n               20104  page reclaims\n                 688  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   5  voluntary context switches\n                 778  involuntary context switches\n           510588977  instructions retired\n           182265345  cycles elapsed\n             2146592  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "go",
+    "workload": "messaging_fanout",
+    "command": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/advanced-backend-bench/backend_bench_go messaging_fanout 50 2 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/messaging_fanout-go.json",
+    "elapsed_ms": 5.3539276123046875,
+    "max_rss_bytes": 5013504,
+    "stdout": "{\n  \"workload\": \"messaging_fanout\",\n  \"samples_ns\": [\n    57084,\n    52000,\n    52042,\n    61875,\n    51917\n  ],\n  \"median_ns\": 52042,\n  \"p95_ns\": 57084,\n  \"p99_ns\": 57084,\n  \"per_call_ns\": 1040.84,\n  \"units_per_second\": 1921524.9221782407,\n  \"iterations\": 50,\n  \"unit_work\": 2\n}\n",
+    "stderr": "        0.00 real         0.00 user         0.00 sys\n             5013504  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 489  page reclaims\n                   1  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   0  voluntary context switches\n                  41  involuntary context switches\n            24991602  instructions retired\n            10304366  cycles elapsed\n             3244440  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "rust",
+    "workload": "messaging_fanout",
+    "command": "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/benchmarks/backend_workloads/rust/target/release/mira-backend-bench messaging_fanout 50 2 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/messaging_fanout-rust.json",
+    "elapsed_ms": 4.788875579833984,
+    "max_rss_bytes": 1703936,
+    "stdout": "{\n  \"workload\": \"messaging_fanout\",\n  \"samples_ns\": [96500,72833,73208,73375,73084],\n  \"median_ns\": 73208,\n  \"p95_ns\": 73375,\n  \"p99_ns\": 73375,\n  \"per_call_ns\": 1464.160,\n  \"units_per_second\": 1365970.932,\n  \"iterations\": 50,\n  \"unit_work\": 2\n}\n",
+    "stderr": "        0.00 real         0.00 user         0.00 sys\n             1703936  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 263  page reclaims\n                   0  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   0  voluntary context switches\n                   4  involuntary context switches\n            25857795  instructions retired\n             8320187  cycles elapsed\n             1097992  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "mira_default",
+    "workload": "messaging_fanout",
+    "command": "cargo run --release --manifest-path /Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml -- bench-source-default /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_messaging_benchmark.mira messaging_fanout_bench 50 2 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/messaging_fanout-mira_default.json",
+    "elapsed_ms": 765.4368877410889,
+    "max_rss_bytes": 100892672,
+    "stdout": "{\"results\":[{\"case\":\"messaging_fanout_bench\",\"file\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_messaging_benchmark.mira\",\"iterations\":50,\"unit_work\":2,\"samples_ns\":[33000,31000,34000,32000,32000],\"median_ns\":32000,\"p95_ns\":33000,\"p99_ns\":33000,\"per_call_ns\":640.000,\"units_per_second\":3125000.000}]}\n",
+    "stderr": "    Finished `release` profile [optimized] target(s) in 0.01s\n     Running `mirac/target/release/mirac bench-source-default /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_messaging_benchmark.mira messaging_fanout_bench 50 2 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/messaging_fanout-mira_default.json`\n        0.76 real         0.70 user         0.06 sys\n           100892672  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n               20132  page reclaims\n                 688  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   5  voluntary context switches\n                 720  involuntary context switches\n           496941069  instructions retired\n           170258316  cycles elapsed\n             2146568  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "go",
+    "workload": "messaging_replay",
+    "command": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/advanced-backend-bench/backend_bench_go messaging_replay 50 2 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/messaging_replay-go.json",
+    "elapsed_ms": 5.169868469238281,
+    "max_rss_bytes": 4636672,
+    "stdout": "{\n  \"workload\": \"messaging_replay\",\n  \"samples_ns\": [\n    57125,\n    32083,\n    28416,\n    30583,\n    31250\n  ],\n  \"median_ns\": 31250,\n  \"p95_ns\": 32083,\n  \"p99_ns\": 32083,\n  \"per_call_ns\": 625,\n  \"units_per_second\": 3200000,\n  \"iterations\": 50,\n  \"unit_work\": 2\n}\n",
+    "stderr": "        0.00 real         0.00 user         0.00 sys\n             4636672  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 470  page reclaims\n                   0  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   1  signals received\n                   0  voluntary context switches\n                  37  involuntary context switches\n            23082673  instructions retired\n             9627839  cycles elapsed\n             2818432  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "rust",
+    "workload": "messaging_replay",
+    "command": "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/benchmarks/backend_workloads/rust/target/release/mira-backend-bench messaging_replay 50 2 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/messaging_replay-rust.json",
+    "elapsed_ms": 9.933948516845703,
+    "max_rss_bytes": 1671168,
+    "stdout": "{\n  \"workload\": \"messaging_replay\",\n  \"samples_ns\": [1242875,1097042,1140458,1071125,1069375],\n  \"median_ns\": 1097042,\n  \"p95_ns\": 1140458,\n  \"p99_ns\": 1140458,\n  \"per_call_ns\": 21940.840,\n  \"units_per_second\": 91154.213,\n  \"iterations\": 50,\n  \"unit_work\": 2\n}\n",
+    "stderr": "        0.00 real         0.00 user         0.00 sys\n             1671168  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 261  page reclaims\n                   0  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   0  voluntary context switches\n                   6  involuntary context switches\n           165304592  instructions retired\n            28625840  cycles elapsed\n             1065224  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "mira_default",
+    "workload": "messaging_replay",
+    "command": "cargo run --release --manifest-path /Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml -- bench-source-default /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_messaging_benchmark.mira messaging_replay_bench 50 2 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/messaging_replay-mira_default.json",
+    "elapsed_ms": 747.1051216125488,
+    "max_rss_bytes": 101384192,
+    "stdout": "{\"results\":[{\"case\":\"messaging_replay_bench\",\"file\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_messaging_benchmark.mira\",\"iterations\":50,\"unit_work\":2,\"samples_ns\":[34000,30000,34000,30000,30000],\"median_ns\":30000,\"p95_ns\":34000,\"p99_ns\":34000,\"per_call_ns\":600.000,\"units_per_second\":3333333.333}]}\n",
+    "stderr": "    Finished `release` profile [optimized] target(s) in 0.00s\n     Running `mirac/target/release/mirac bench-source-default /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_messaging_benchmark.mira messaging_replay_bench 50 2 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/messaging_replay-mira_default.json`\n        0.74 real         0.68 user         0.06 sys\n           101384192  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n               20302  page reclaims\n                 688  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   6  voluntary context switches\n                 746  involuntary context switches\n           491032348  instructions retired\n           167938871  cycles elapsed\n             2244896  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "go",
+    "workload": "analytics_aggregation",
+    "command": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/advanced-backend-bench/backend_bench_go analytics_aggregation 100 1 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/analytics_aggregation-go.json",
+    "elapsed_ms": 4.678010940551758,
+    "max_rss_bytes": 4833280,
+    "stdout": "{\n  \"workload\": \"analytics_aggregation\",\n  \"samples_ns\": [\n    95041,\n    64833,\n    64041,\n    64125,\n    62291\n  ],\n  \"median_ns\": 64125,\n  \"p95_ns\": 64833,\n  \"p99_ns\": 64833,\n  \"per_call_ns\": 641.25,\n  \"units_per_second\": 1559454.1910331384,\n  \"iterations\": 100,\n  \"unit_work\": 1\n}\n",
+    "stderr": "        0.00 real         0.00 user         0.00 sys\n             4833280  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 479  page reclaims\n                   0  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   0  voluntary context switches\n                  38  involuntary context switches\n            26780467  instructions retired\n             9121650  cycles elapsed\n             2998656  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "rust",
+    "workload": "analytics_aggregation",
+    "command": "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/benchmarks/backend_workloads/rust/target/release/mira-backend-bench analytics_aggregation 100 1 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/analytics_aggregation-rust.json",
+    "elapsed_ms": 5.349874496459961,
+    "max_rss_bytes": 1605632,
+    "stdout": "{\n  \"workload\": \"analytics_aggregation\",\n  \"samples_ns\": [208416,211625,209375,206584,206250],\n  \"median_ns\": 208416,\n  \"p95_ns\": 209375,\n  \"p99_ns\": 209375,\n  \"per_call_ns\": 2084.160,\n  \"units_per_second\": 479809.612,\n  \"iterations\": 100,\n  \"unit_work\": 1\n}\n",
+    "stderr": "        0.00 real         0.00 user         0.00 sys\n             1605632  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 257  page reclaims\n                   0  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   0  voluntary context switches\n                   6  involuntary context switches\n            36827170  instructions retired\n            10886186  cycles elapsed\n             1016072  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "mira_default",
+    "workload": "analytics_aggregation",
+    "command": "cargo run --release --manifest-path /Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml -- bench-source-default /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_analytics_benchmark.mira analytics_aggregation_bench 100 1 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/analytics_aggregation-mira_default.json",
+    "elapsed_ms": 727.9231548309326,
+    "max_rss_bytes": 100171776,
+    "stdout": "{\"results\":[{\"case\":\"analytics_aggregation_bench\",\"file\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_analytics_benchmark.mira\",\"iterations\":100,\"unit_work\":1,\"samples_ns\":[65000,61000,59000,60000,60000],\"median_ns\":60000,\"p95_ns\":61000,\"p99_ns\":61000,\"per_call_ns\":600.000,\"units_per_second\":1666666.667}]}\n",
+    "stderr": "    Finished `release` profile [optimized] target(s) in 0.01s\n     Running `mirac/target/release/mirac bench-source-default /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_analytics_benchmark.mira analytics_aggregation_bench 100 1 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/analytics_aggregation-mira_default.json`\n        0.72 real         0.66 user         0.06 sys\n           100171776  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n               20095  page reclaims\n                 688  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   5  voluntary context switches\n                 675  involuntary context switches\n           515319848  instructions retired\n           169373319  cycles elapsed\n             2212104  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "go",
+    "workload": "analytics_worker_throughput",
+    "command": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/advanced-backend-bench/backend_bench_go analytics_worker_throughput 50 3 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/analytics_worker_throughput-go.json",
+    "elapsed_ms": 328.2887935638428,
+    "max_rss_bytes": 4882432,
+    "stdout": "{\n  \"workload\": \"analytics_worker_throughput\",\n  \"samples_ns\": [\n    65948750,\n    65192625,\n    63398084,\n    63507917,\n    62289959\n  ],\n  \"median_ns\": 63507917,\n  \"p95_ns\": 65192625,\n  \"p99_ns\": 65192625,\n  \"per_call_ns\": 1270158.34,\n  \"units_per_second\": 2361.91024813489,\n  \"iterations\": 50,\n  \"unit_work\": 3\n}\n",
+    "stderr": "        0.32 real         0.00 user         0.00 sys\n             4882432  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 484  page reclaims\n                   1  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   0  voluntary context switches\n                 839  involuntary context switches\n            38795016  instructions retired\n            37731533  cycles elapsed\n             3080576  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "rust",
+    "workload": "analytics_worker_throughput",
+    "command": "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/benchmarks/backend_workloads/rust/target/release/mira-backend-bench analytics_worker_throughput 50 3 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/analytics_worker_throughput-rust.json",
+    "elapsed_ms": 417.91486740112305,
+    "max_rss_bytes": 1835008,
+    "stdout": "{\n  \"workload\": \"analytics_worker_throughput\",\n  \"samples_ns\": [80879125,85362000,82995166,81336917,82671667],\n  \"median_ns\": 82671667,\n  \"p95_ns\": 82995166,\n  \"p99_ns\": 82995166,\n  \"per_call_ns\": 1653433.340,\n  \"units_per_second\": 1814.406,\n  \"iterations\": 50,\n  \"unit_work\": 3\n}\n",
+    "stderr": "        0.41 real         0.00 user         0.02 sys\n             1835008  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                1769  page reclaims\n                   0  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   0  voluntary context switches\n                2282  involuntary context switches\n           123941583  instructions retired\n           126389288  cycles elapsed\n             1278216  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "mira_default",
+    "workload": "analytics_worker_throughput",
+    "command": "cargo run --release --manifest-path /Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml -- bench-source-default /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_analytics_benchmark.mira analytics_worker_throughput_bench 50 3 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/analytics_worker_throughput-mira_default.json",
+    "elapsed_ms": 755.6979656219482,
+    "max_rss_bytes": 99909632,
+    "stdout": "{\"results\":[{\"case\":\"analytics_worker_throughput_bench\",\"file\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_analytics_benchmark.mira\",\"iterations\":50,\"unit_work\":3,\"samples_ns\":[35000,32000,33000,44000,31000],\"median_ns\":33000,\"p95_ns\":35000,\"p99_ns\":35000,\"per_call_ns\":660.000,\"units_per_second\":4545454.545}]}\n",
+    "stderr": "    Finished `release` profile [optimized] target(s) in 0.00s\n     Running `mirac/target/release/mirac bench-source-default /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_analytics_benchmark.mira analytics_worker_throughput_bench 50 3 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/analytics_worker_throughput-mira_default.json`\n        0.75 real         0.68 user         0.06 sys\n            99909632  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n               20121  page reclaims\n                 688  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   6  voluntary context switches\n                 746  involuntary context switches\n           491475102  instructions retired\n           162957552  cycles elapsed\n             2277640  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "go",
+    "workload": "analytics_failure_recovery",
+    "command": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/advanced-backend-bench/backend_bench_go analytics_failure_recovery 50 1 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/analytics_failure_recovery-go.json",
+    "elapsed_ms": 5.03230094909668,
+    "max_rss_bytes": 4784128,
+    "stdout": "{\n  \"workload\": \"analytics_failure_recovery\",\n  \"samples_ns\": [\n    55625,\n    27250,\n    27334,\n    29167,\n    27375\n  ],\n  \"median_ns\": 27375,\n  \"p95_ns\": 29167,\n  \"p99_ns\": 29167,\n  \"per_call_ns\": 547.5,\n  \"units_per_second\": 1826484.0182648401,\n  \"iterations\": 50,\n  \"unit_work\": 1\n}\n",
+    "stderr": "        0.00 real         0.00 user         0.00 sys\n             4784128  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 476  page reclaims\n                   0  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   0  voluntary context switches\n                  39  involuntary context switches\n            22280969  instructions retired\n             9220191  cycles elapsed\n             2965912  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "rust",
+    "workload": "analytics_failure_recovery",
+    "command": "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/benchmarks/backend_workloads/rust/target/release/mira-backend-bench analytics_failure_recovery 50 1 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/analytics_failure_recovery-rust.json",
+    "elapsed_ms": 11.576175689697266,
+    "max_rss_bytes": 1638400,
+    "stdout": "{\n  \"workload\": \"analytics_failure_recovery\",\n  \"samples_ns\": [1491584,1491833,1519917,1515458,1507417],\n  \"median_ns\": 1507417,\n  \"p95_ns\": 1515458,\n  \"p99_ns\": 1515458,\n  \"per_call_ns\": 30148.340,\n  \"units_per_second\": 33169.322,\n  \"iterations\": 50,\n  \"unit_work\": 1\n}\n",
+    "stderr": "        0.00 real         0.00 user         0.00 sys\n             1638400  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 259  page reclaims\n                   0  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   0  voluntary context switches\n                   4  involuntary context switches\n           201492071  instructions retired\n            35690803  cycles elapsed\n             1032456  peak memory footprint\n",
+    "returncode": 0
+  },
+  {
+    "runtime": "mira_default",
+    "workload": "analytics_failure_recovery",
+    "command": "cargo run --release --manifest-path /Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml -- bench-source-default /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_analytics_benchmark.mira analytics_failure_recovery_bench 50 1 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/analytics_failure_recovery-mira_default.json",
+    "elapsed_ms": 776.8428325653076,
+    "max_rss_bytes": 100614144,
+    "stdout": "{\"results\":[{\"case\":\"analytics_failure_recovery_bench\",\"file\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_analytics_benchmark.mira\",\"iterations\":50,\"unit_work\":1,\"samples_ns\":[34000,31000,32000,30000,30000],\"median_ns\":31000,\"p95_ns\":32000,\"p99_ns\":32000,\"per_call_ns\":620.000,\"units_per_second\":1612903.226}]}\n",
+    "stderr": "    Finished `release` profile [optimized] target(s) in 0.01s\n     Running `mirac/target/release/mirac bench-source-default /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_advanced_analytics_benchmark.mira analytics_failure_recovery_bench 50 1 /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-native/analytics_failure_recovery-mira_default.json`\n        0.77 real         0.70 user         0.07 sys\n           100614144  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n               20251  page reclaims\n                 688  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   5  voluntary context switches\n                 989  involuntary context switches\n           492309278  instructions retired\n           170488250  cycles elapsed\n             2195744  peak memory footprint\n",
+    "returncode": 0
+  }
+]

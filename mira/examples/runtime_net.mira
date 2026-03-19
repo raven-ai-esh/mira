@@ -1,0 +1,26 @@
+module runtime.net@1
+target native
+
+func connect_listener
+ret b1
+eff net
+cap net("127.0.0.1:38417")
+spec kind=net constraints=[net,connect_only]
+block b0
+  v0:b1 = net_connect
+  return v0
+test t0
+  out true
+end
+
+func connect_closed_port
+ret b1
+eff net
+cap net("127.0.0.1:38418")
+spec kind=net constraints=[net,connect_only]
+block b0
+  v0:b1 = net_connect
+  return v0
+test t0
+  out false
+end

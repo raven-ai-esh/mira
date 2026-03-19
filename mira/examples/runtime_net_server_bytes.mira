@@ -1,0 +1,24 @@
+module runtime.net.server.bytes@1
+target native
+
+func serve_and_capture_second_byte
+ret u8
+eff net alloc
+cap net("127.0.0.1:38423")
+spec kind=net constraints=[net,bytes,server,exchange]
+block b0
+  v0:own[buf[u8]] = alloc heap 4u32
+  v1:edit[buf[u8]] = edit v0
+  v2:edit[buf[u8]] = store v1 0u32 80u8
+  v3:edit[buf[u8]] = store v2 1u32 79u8
+  v4:edit[buf[u8]] = store v3 2u32 78u8
+  v5:edit[buf[u8]] = store v4 3u32 71u8
+  v6:own[buf[u8]] = net_serve_exchange_all v5
+  v7:view[buf[u8]] = view v6
+  v8:u8 = load v7 1u32
+  v9:b1 = drop v6
+  v10:b1 = drop v0
+  return v8
+test t0
+  out 73u8
+end

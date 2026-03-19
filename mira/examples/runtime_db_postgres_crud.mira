@@ -1,0 +1,56 @@
+module runtime.db.postgres.crud@1
+target native
+
+func pool_lookup_status
+ret u8
+eff db alloc
+cap db("postgresql://miratest:miratest@127.0.0.1:55432/mira_test")
+spec kind=db constraints=[postgres,pool,prepared,row_decode]
+block b0
+  v0:u64 = db_pool_open postgresql://miratest:miratest@127.0.0.1:55432/mira_test 2u32
+  v1:u64 = db_pool_acquire v0
+  v2:own[buf[u8]] = buf_lit DROP\x20TABLE\x20IF\x20EXISTS\x20items;\x20CREATE\x20TABLE\x20items(id\x20INTEGER\x20PRIMARY\x20KEY,\x20value\x20TEXT\x20NOT\x20NULL);\x20
+  v3:b1 = db_exec v1 v2
+  v4:own[buf[u8]] = buf_lit INSERT\x20INTO\x20items(id,\x20value)\x20VALUES($1,\x20$2);
+  v5:b1 = db_prepare v1 insert_item v4
+  v6:own[buf[u8]] = buf_lit SELECT\x20value\x20FROM\x20items\x20WHERE\x20id\x20=\x20$1;
+  v7:b1 = db_prepare v1 get_item v6
+  v8:own[buf[u8]] = buf_lit [42,\x22widget\x22]
+  v9:b1 = db_exec_prepared v1 insert_item v8
+  v10:own[buf[u8]] = buf_lit [7,\x22other\x22]
+  v11:b1 = db_exec_prepared v1 insert_item v10
+  v12:own[buf[u8]] = buf_lit [42]
+  v13:own[buf[u8]] = db_query_prepared_buf v1 get_item v12
+  v14:own[str] = buf_to_str v13
+  v15:b1 = str_eq_lit v14 widget
+  branch v15 b1(v0, v1, v2, v4, v6, v8, v10, v12, v13, v14) b2(v0, v1, v2, v4, v6, v8, v10, v12, v13, v14)
+
+block b1(pool:u64, dbh:u64, setup:own[buf[u8]], insert_sql:own[buf[u8]], query_sql:own[buf[u8]], params_a:own[buf[u8]], params_b:own[buf[u8]], lookup_params:own[buf[u8]], row:own[buf[u8]], row_text:own[str])
+  v16:b1 = db_pool_release pool dbh
+  v17:b1 = db_pool_close pool
+  v18:b1 = drop row_text
+  v19:b1 = drop row
+  v20:b1 = drop lookup_params
+  v21:b1 = drop params_b
+  v22:b1 = drop params_a
+  v23:b1 = drop query_sql
+  v24:b1 = drop insert_sql
+  v25:b1 = drop setup
+  return 1u8
+
+block b2(pool:u64, dbh:u64, setup:own[buf[u8]], insert_sql:own[buf[u8]], query_sql:own[buf[u8]], params_a:own[buf[u8]], params_b:own[buf[u8]], lookup_params:own[buf[u8]], row:own[buf[u8]], row_text:own[str])
+  v26:b1 = db_pool_release pool dbh
+  v27:b1 = db_pool_close pool
+  v28:b1 = drop row_text
+  v29:b1 = drop row
+  v30:b1 = drop lookup_params
+  v31:b1 = drop params_b
+  v32:b1 = drop params_a
+  v33:b1 = drop query_sql
+  v34:b1 = drop insert_sql
+  v35:b1 = drop setup
+  return 0u8
+
+test t0
+  out 1u8
+end

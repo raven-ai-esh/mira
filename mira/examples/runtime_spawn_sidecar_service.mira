@@ -1,0 +1,100 @@
+module runtime.spawn.sidecar.service@1
+target native
+
+func sidecar_echo_first_byte
+ret u8
+eff spawn alloc
+cap spawn("/bin/cat")
+spec kind=spawn constraints=[spawn,stdio,argv,env,lifecycle]
+block b0
+  v0:own[buf[u8]] = buf_lit PING
+  v1:u64 = spawn_open /bin/cat - env:SVC_MODE=sidecar
+  v2:b1 = spawn_stdin_write_all v1 v0
+  v3:b1 = spawn_stdin_close v1
+  v4:i32 = spawn_wait v1
+  v5:b1 = spawn_done v1
+  v6:b1 = spawn_exit_ok v1
+  branch v6 b1(v0, v1) b2(v0, v1)
+
+block b1(input:own[buf[u8]], handle:u64)
+  v7:own[buf[u8]] = spawn_stdout_all handle
+  v8:own[buf[u8]] = spawn_stderr_all handle
+  v9:view[buf[u8]] = view v7
+  v10:u8 = load v9 0u32
+  v11:b1 = spawn_close handle
+  v12:b1 = drop v8
+  v13:b1 = drop v7
+  v14:b1 = drop input
+  return v10
+
+block b2(input:own[buf[u8]], handle:u64)
+  v15:b1 = spawn_close handle
+  v16:b1 = drop input
+  return 0u8
+test t0
+  out 80u8
+end
+
+func kill_idle_sidecar_ok
+ret u8
+eff spawn alloc
+cap spawn("/bin/cat")
+spec kind=spawn constraints=[kill,lifecycle]
+block b0
+  v0:u64 = spawn_open /bin/cat - env:SVC_MODE=kill
+  v1:b1 = spawn_kill v0
+  v2:b1 = spawn_done v0
+  v3:b1 = spawn_close v0
+  return 1u8
+test t0
+  out 1u8
+end
+
+func serve_sidecar_echo_once
+ret u8
+eff net spawn alloc
+cap net("127.0.0.1:39613")
+cap spawn("/bin/cat")
+spec kind=http constraints=[spawn,sidecar,server,session_protocol]
+block b0
+  v0:u64 = net_listen
+  v1:u64 = http_session_accept v0
+  v2:own[buf[u8]] = http_session_request v1
+  v3:view[buf[u8]] = view v2
+  v4:own[buf[u8]] = http_body v3
+  v5:u64 = spawn_open /bin/cat - env:SVC_MODE=sidecar
+  v6:b1 = spawn_stdin_write_all v5 v4
+  v7:b1 = spawn_stdin_close v5
+  v8:i32 = spawn_wait v5
+  v9:b1 = spawn_done v5
+  v10:b1 = spawn_exit_ok v5
+  branch v10 b1(v0, v1, v2, v4, v5) b2(v0, v1, v2, v4, v5)
+
+block b1(listener:u64, conn:u64, req:own[buf[u8]], body:own[buf[u8]], handle:u64)
+  v11:own[buf[u8]] = spawn_stdout_all handle
+  v12:own[buf[u8]] = spawn_stderr_all handle
+  v13:view[buf[u8]] = view v11
+  v14:u8 = load v13 0u32
+  v15:u32 = http_server_config_u32 status_ok
+  v16:b1 = http_session_write_text conn v15 v11
+  v17:b1 = spawn_close handle
+  v18:b1 = http_session_close conn
+  v19:b1 = net_close listener
+  v20:b1 = drop v12
+  v21:b1 = drop v11
+  v22:b1 = drop body
+  v23:b1 = drop req
+  return v14
+
+block b2(listener:u64, conn:u64, req:own[buf[u8]], body:own[buf[u8]], handle:u64)
+  v24:own[buf[u8]] = spawn_stderr_all handle
+  v25:u32 = http_server_config_u32 status_internal_error
+  v26:b1 = http_session_write_text conn v25 v24
+  v27:b1 = spawn_close handle
+  v28:b1 = http_session_close conn
+  v29:b1 = net_close listener
+  v30:b1 = drop v24
+  v31:b1 = drop body
+  v32:b1 = drop req
+  return 0u8
+end

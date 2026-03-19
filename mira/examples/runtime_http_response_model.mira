@@ -1,0 +1,30 @@
+module runtime.http.response.model@1
+target native
+
+type response = struct[status:u32,body_code:u32]
+
+func response_status_created
+ret u32
+eff pure
+spec kind=http constraints=[response_model,struct,pure]
+block b0
+  v0:u32 = http_server_config_u32 status_created
+  v1:response = make response v0 2u32
+  v2:u32 = field v1 status
+  return v2
+test t0
+  out 201u32
+end
+
+func response_status_payload_too_large
+ret u32
+eff pure
+spec kind=http constraints=[response_model,error_policy,pure]
+block b0
+  v0:u32 = http_server_config_u32 status_payload_too_large
+  v1:response = make response v0 5u32
+  v2:u32 = field v1 status
+  return v2
+test t0
+  out 413u32
+end

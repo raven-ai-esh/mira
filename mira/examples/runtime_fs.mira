@@ -1,0 +1,15 @@
+module runtime.fs@1
+target native
+
+func roundtrip_u32
+ret u32
+eff fs.read fs.write
+cap fs("/tmp/mira_runtime_fs_u32.txt")
+spec kind=runtime constraints=[fs.read,fs.write,capability_bound]
+block b0
+  v0:b1 = fs_write_u32 29u32
+  v1:u32 = fs_read_u32
+  return v1
+test t0
+  out 29u32
+end

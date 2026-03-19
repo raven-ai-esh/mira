@@ -1,0 +1,263 @@
+{
+  "release": "2.6.0",
+  "profile_set": "messaging",
+  "ok": true,
+  "profiles": [
+    {
+      "name": "production_messenger_backend",
+      "source": "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_production_messenger_backend.mira",
+      "artifact": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/production_messenger_backend.mirb3",
+      "missing_tokens": [],
+      "checks": [
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "check",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_production_messenger_backend.mira"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"path\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_production_messenger_backend.mira\",\"module\":\"runtime.production.messenger.backend@1\",\"functions\":[\"production_messenger_backend_status\",\"messenger_fanout_batch_status\",\"messenger_replay_cursor_status\",\"messenger_fanout_status\",\"messenger_replay_status\"]}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac check /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_production_messenger_backend.mira`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "test",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_production_messenger_backend.mira"
+          ],
+          "ok": true,
+          "stdout": "ok\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac test /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_production_messenger_backend.mira`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "emit-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_production_messenger_backend.mira",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/production_messenger_backend.mirb3"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"output\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/production_messenger_backend.mirb3\"}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac emit-binary /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_production_messenger_backend.mira /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/production_messenger_backend.mirb3`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "check-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/production_messenger_backend.mirb3"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"path\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/production_messenger_backend.mirb3\",\"module\":\"runtime.production.messenger.backend@1\",\"functions\":[\"production_messenger_backend_status\",\"messenger_fanout_batch_status\",\"messenger_replay_cursor_status\",\"messenger_fanout_status\",\"messenger_replay_status\"],\"artifact\":\"lowered\"}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac check-binary /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/production_messenger_backend.mirb3`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "test-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/production_messenger_backend.mirb3"
+          ],
+          "ok": true,
+          "stdout": "portable bytecode tests passed: 5/5\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac test-binary /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/production_messenger_backend.mirb3`\n",
+          "returncode": 0
+        }
+      ],
+      "ok": true
+    },
+    {
+      "name": "room_fanout_service",
+      "source": "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_room_fanout_service.mira",
+      "artifact": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/room_fanout_service.mirb3",
+      "missing_tokens": [],
+      "checks": [
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "check",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_room_fanout_service.mira"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"path\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_room_fanout_service.mira\",\"module\":\"runtime.room.fanout.service@1\",\"functions\":[\"room_fanout_service_status\"]}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac check /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_room_fanout_service.mira`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "test",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_room_fanout_service.mira"
+          ],
+          "ok": true,
+          "stdout": "ok\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac test /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_room_fanout_service.mira`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "emit-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_room_fanout_service.mira",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/room_fanout_service.mirb3"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"output\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/room_fanout_service.mirb3\"}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac emit-binary /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_room_fanout_service.mira /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/room_fanout_service.mirb3`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "check-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/room_fanout_service.mirb3"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"path\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/room_fanout_service.mirb3\",\"module\":\"runtime.room.fanout.service@1\",\"functions\":[\"room_fanout_service_status\"],\"artifact\":\"lowered\"}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac check-binary /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/room_fanout_service.mirb3`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "test-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/room_fanout_service.mirb3"
+          ],
+          "ok": true,
+          "stdout": "portable bytecode tests passed: 1/1\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac test-binary /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/room_fanout_service.mirb3`\n",
+          "returncode": 0
+        }
+      ],
+      "ok": true
+    },
+    {
+      "name": "offline_catchup_worker",
+      "source": "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_offline_catchup_worker.mira",
+      "artifact": "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/offline_catchup_worker.mirb3",
+      "missing_tokens": [],
+      "checks": [
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "check",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_offline_catchup_worker.mira"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"path\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_offline_catchup_worker.mira\",\"module\":\"runtime.offline.catchup.worker@1\",\"functions\":[\"offline_catchup_worker_status\"]}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s\n     Running `mirac/target/debug/mirac check /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_offline_catchup_worker.mira`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "test",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_offline_catchup_worker.mira"
+          ],
+          "ok": true,
+          "stdout": "ok\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac test /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_offline_catchup_worker.mira`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "emit-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_offline_catchup_worker.mira",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/offline_catchup_worker.mirb3"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"output\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/offline_catchup_worker.mirb3\"}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac emit-binary /Users/sheremetovegor/Documents/Raven/personal-activity/mira/examples/runtime_offline_catchup_worker.mira /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/offline_catchup_worker.mirb3`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "check-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/offline_catchup_worker.mirb3"
+          ],
+          "ok": true,
+          "stdout": "{\"ok\":true,\"path\":\"/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/offline_catchup_worker.mirb3\",\"module\":\"runtime.offline.catchup.worker@1\",\"functions\":[\"offline_catchup_worker_status\"],\"artifact\":\"lowered\"}\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac check-binary /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/offline_catchup_worker.mirb3`\n",
+          "returncode": 0
+        },
+        {
+          "command": [
+            "cargo",
+            "run",
+            "--manifest-path",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/mirac/Cargo.toml",
+            "--",
+            "test-binary",
+            "/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/offline_catchup_worker.mirb3"
+          ],
+          "ok": true,
+          "stdout": "portable bytecode tests passed: 1/1\n",
+          "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s\n     Running `mirac/target/debug/mirac test-binary /Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/messaging-conformance-artifacts/offline_catchup_worker.mirb3`\n",
+          "returncode": 0
+        }
+      ],
+      "ok": true
+    }
+  ],
+  "failures": []
+}

@@ -1,0 +1,24 @@
+module runtime.fs.bytes@1
+target native
+
+func roundtrip_byte
+ret u8
+eff alloc fs.read fs.write
+cap fs("/tmp/mira_runtime_fs_bytes.bin")
+spec kind=runtime constraints=[alloc,fs.read,fs.write,capability_bound,binary_io]
+block b0
+  v0:own[buf[u8]] = alloc arena 3u32
+  v1:edit[buf[u8]] = edit v0
+  v2:edit[buf[u8]] = store v1 0u32 65u8
+  v3:edit[buf[u8]] = store v2 1u32 66u8
+  v4:edit[buf[u8]] = store v3 2u32 67u8
+  v5:view[buf[u8]] = view v4
+  v6:b1 = fs_write_all v5
+  v7:own[buf[u8]] = fs_read_all
+  v8:view[buf[u8]] = view v7
+  v9:u8 = load v8 1u32
+  v10:b1 = drop v7
+  return v9
+test t0
+  out 66u8
+end

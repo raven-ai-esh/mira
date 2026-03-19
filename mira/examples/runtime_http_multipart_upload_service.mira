@@ -1,0 +1,55 @@
+module runtime.http.multipart.upload.service@1
+target native
+
+func inspect_upload_request
+ret u8
+eff net alloc
+cap net("127.0.0.1:39610")
+spec kind=http constraints=[multipart,headers,header_map,body]
+block b0
+  v0:own[buf[u8]] = buf_lit POST\x20/upload\x20HTTP/1.1\r\nHost:\x20localhost\r\nContent-Type:\x20multipart/form-data;\x20boundary=BOUNDARY\r\nX-Upload-Token:\x20abc123\r\nContent-Length:\x20123\r\n\r\n--BOUNDARY\r\nContent-Disposition:\x20form-data;\x20name=\x22file\x22;\x20filename=\x22upload.txt\x22\r\nContent-Type:\x20text/plain\r\n\r\nPING\r\n--BOUNDARY--\r\n
+  v1:view[buf[u8]] = view v0
+  v2:u32 = http_header_count v1
+  v3:own[buf[u8]] = http_header_name v1 1u32
+  v4:own[buf[u8]] = http_header_value v1 1u32
+  v5:u32 = http_multipart_part_count v1
+  v6:own[buf[u8]] = http_multipart_part_name v1 0u32
+  v7:own[buf[u8]] = http_multipart_part_filename v1 0u32
+  v8:own[buf[u8]] = http_multipart_part_body v1 0u32
+  v9:view[buf[u8]] = view v8
+  v10:u8 = load v9 0u32
+  v11:b1 = drop v8
+  v12:b1 = drop v7
+  v13:b1 = drop v6
+  v14:b1 = drop v4
+  v15:b1 = drop v3
+  v16:b1 = drop v0
+  return v10
+test t0
+  out 80u8
+end
+
+func serve_multipart_upload_once
+ret u8
+eff net alloc
+cap net("127.0.0.1:39610")
+spec kind=http constraints=[multipart,upload,server,session_protocol]
+block b0
+  v0:u64 = net_listen
+  v1:u64 = http_session_accept v0
+  v2:own[buf[u8]] = http_session_request v1
+  v3:view[buf[u8]] = view v2
+  v4:u32 = http_multipart_part_count v3
+  v5:own[buf[u8]] = http_multipart_part_body v3 0u32
+  v6:view[buf[u8]] = view v5
+  v7:u8 = load v6 0u32
+  v8:own[buf[u8]] = buf_lit uploaded
+  v9:u32 = http_server_config_u32 status_created
+  v10:b1 = http_session_write_text v1 v9 v8
+  v11:b1 = http_session_close v1
+  v12:b1 = net_close v0
+  v13:b1 = drop v8
+  v14:b1 = drop v5
+  v15:b1 = drop v2
+  return v7
+end

@@ -1,0 +1,56 @@
+module runtime.degraded.mode.service@1
+target native
+
+func degraded_service_status
+ret u8
+eff service alloc
+cap service("degraded-mode-api")
+spec kind=service constraints=[degraded_mode,health_probe,structured_events,metrics]
+block b0
+  v0:u64 = service_open
+  v1:b1 = service_set_health v0 200u32
+  v2:b1 = service_set_readiness v0 200u32
+  v3:b1 = service_set_degraded v0 true
+  v4:b1 = service_failure_count v0 downstream 2u32
+  v5:own[buf[u8]] = buf_lit stale_cache
+  v6:b1 = service_event v0 degraded_response v5
+  v7:b1 = service_metric_count_dim v0 fallback_hits degraded 1u32
+  v8:b1 = service_degraded v0
+  v9:u32 = service_health_status v0
+  v10:u32 = service_readiness_status v0
+  v11:u32 = service_event_total v0 degraded_response
+  v12:u32 = service_failure_total v0 downstream
+  v13:u32 = service_metric_total v0 fallback_hits
+  v14:b1 = service_close v0
+  v15:b1 = drop v5
+  branch v8 b1(v9, v10, v11, v12, v13) b9
+
+block b1(health:u32, ready:u32, events:u32, failures:u32, metrics:u32)
+  v16:b1 = eq health 200u32
+  branch v16 b2(ready, events, failures, metrics) b9
+
+block b2(ready:u32, events:u32, failures:u32, metrics:u32)
+  v17:b1 = eq ready 200u32
+  branch v17 b3(events, failures, metrics) b9
+
+block b3(events:u32, failures:u32, metrics:u32)
+  v18:b1 = eq events 1u32
+  branch v18 b4(failures, metrics) b9
+
+block b4(failures:u32, metrics:u32)
+  v19:b1 = eq failures 2u32
+  branch v19 b5(metrics) b9
+
+block b5(metrics:u32)
+  v20:b1 = eq metrics 1u32
+  branch v20 b6 b9
+
+block b6
+  return 1u8
+
+block b9
+  return 0u8
+
+test t0
+  out 1u8
+end

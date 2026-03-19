@@ -1,0 +1,195 @@
+module runtime.reference.backend.service@1
+target native
+
+func reference_service_status
+ret u32
+eff service db net alloc
+cap service("orders-api")
+cap db("tmp/mira-tests/orders-api.db")
+cap net("127.0.0.1:39582")
+cap tls("cert=/tmp/mira_tls_server.crt,key=/tmp/mira_tls_server.key,request_timeout_ms=5000,session_timeout_ms=2000,shutdown_grace_ms=250")
+spec kind=service constraints=[http,tls,json,middleware,db,health,metrics,logging,graceful_shutdown]
+block b0
+  v0:u64 = service_open
+  v1:own[buf[u8]] = buf_lit booting
+  v2:b1 = service_log v0 info v1
+  v3:u64 = db_open tmp/mira-tests/orders-api.db
+  v4:b1 = service_migrate_db v0 v3 bootstrap
+  v5:u32 = tls_server_config_u32 request_timeout_ms
+  v6:own[buf[u8]] = tls_server_config_buf cert
+  v7:own[buf[u8]] = buf_lit POST\x20/orders\x20HTTP/1.1\r\nHost:\x20localhost\r\nAuthorization:\x20token-42\r\nContent-Type:\x20application/json\r\n\r\n{\x22id\x22:42}
+  v8:b1 = service_route v7 POST /orders
+  v9:b1 = service_require_header v7 Authorization token-42
+  v10:own[buf[u8]] = http_body v7
+  v11:u32 = json_get_u32 v10 id
+  v12:own[buf[u8]] = buf_lit SELECT\x2042
+  v13:u32 = db_query_u32 v3 v12
+  v14:b1 = eq v11 42u32
+  v15:b1 = eq v13 42u32
+  v16:u64 = service_trace_begin v0 request
+  v17:b1 = service_metric_count v0 request_total 1u32
+  v18:u32 = service_health_status v0
+  v19:u32 = service_readiness_status v0
+  v20:b1 = service_trace_end v16
+  v21:b1 = db_close v3
+  v22:b1 = service_shutdown v0 5u32
+  v23:b1 = service_close v0
+  v24:b1 = drop v12
+  v25:b1 = drop v10
+  v26:b1 = drop v7
+  v27:b1 = drop v6
+  v28:b1 = drop v1
+  branch v8 b1(v9, v14, v15, v18, v19, v5) b5
+
+block b1(auth_ok:b1, json_ok:b1, db_ok:b1, health:u32, ready:u32, tls_timeout:u32)
+  branch auth_ok b2(json_ok, db_ok, health, ready, tls_timeout) b6
+
+block b2(json_ok:b1, db_ok:b1, health:u32, ready:u32, tls_timeout:u32)
+  branch json_ok b3(db_ok, health, ready, tls_timeout) b7
+
+block b3(db_ok:b1, health:u32, ready:u32, tls_timeout:u32)
+  branch db_ok b4(health, ready, tls_timeout) b8
+
+block b4(health:u32, ready:u32, tls_timeout:u32)
+  v29:b1 = eq ready 200u32
+  branch v29 b9(health, tls_timeout) b10
+
+block b5
+  v30:u32 = service_error_status not_found
+  return v30
+
+block b6
+  v31:u32 = service_error_status unauthorized
+  return v31
+
+block b7
+  v32:u32 = service_error_status bad_request
+  return v32
+
+block b8
+  v33:u32 = service_error_status service_unavailable
+  return v33
+
+block b9(health:u32, tls_timeout:u32)
+  v34:b1 = eq tls_timeout 5000u32
+  branch v34 b11(health) b8
+
+block b10
+  v35:u32 = service_error_status service_unavailable
+  return v35
+
+block b11(health:u32)
+  return health
+
+test t0
+  out 200u32
+
+end
+
+func tls_config_ready
+ret u32
+eff net alloc
+cap net("127.0.0.1:39582")
+cap tls("cert=/tmp/mira_tls_server.crt,key=/tmp/mira_tls_server.key,request_timeout_ms=5000,session_timeout_ms=2000,shutdown_grace_ms=250")
+spec kind=service constraints=[tls,config]
+block b0
+  v0:u32 = tls_server_config_u32 session_timeout_ms
+  v1:own[buf[u8]] = tls_server_config_buf key
+  v2:b1 = drop v1
+  return v0
+
+test t0
+  out 2000u32
+
+end
+
+func serve_tls_hello_once
+ret u8
+eff net alloc
+cap net("127.0.0.1:39582")
+cap tls("cert=/tmp/mira_tls_server.crt,key=/tmp/mira_tls_server.key,request_timeout_ms=5000,session_timeout_ms=2000,shutdown_grace_ms=250")
+spec kind=http constraints=[tls,server,hello,reference_service]
+block b0
+  v0:u64 = tls_listen
+  v1:u32 = tls_server_config_u32 request_timeout_ms
+  v2:b1 = listener_set_timeout_ms v0 v1
+  v3:u32 = tls_server_config_u32 shutdown_grace_ms
+  v4:b1 = listener_set_shutdown_grace_ms v0 v3
+  v5:u64 = http_session_accept v0
+  v6:u32 = tls_server_config_u32 session_timeout_ms
+  v7:b1 = session_set_timeout_ms v5 v6
+  v8:own[buf[u8]] = http_session_request v5
+  v9:own[buf[u8]] = buf_lit REFERENCE_TLS
+  v10:b1 = http_session_write_text v5 200u32 v9
+  v11:b1 = http_session_close v5
+  v12:b1 = net_close v0
+  v13:b1 = drop v9
+  v14:b1 = drop v8
+  return 1u8
+end
+
+func reference_worker
+arg req:u32
+ret u32
+eff spawn clock
+cap clock("monotonic")
+spec kind=runtime constraints=[worker_pool,fanout,fanin,cancel_safe]
+block b0
+  v0:b1 = rt_cancelled
+  branch v0 b1(req) b2(req)
+
+block b1(req:u32)
+  return 503u32
+
+block b2(req:u32)
+  v1:b1 = task_sleep_ms 1u32
+  v2:u32 = add req 200u32
+  return v2
+end
+
+func reference_batch
+ret u32
+eff spawn clock
+cap clock("monotonic")
+spec kind=runtime constraints=[http_like,worker_pool,many_inflight,graceful_shutdown]
+block b0
+  v0:u64 = rt_open 4u32
+  v1:u64 = rt_spawn_u32 v0 reference_worker 1u32
+  v2:u64 = rt_spawn_u32 v0 reference_worker 2u32
+  v3:u64 = rt_spawn_u32 v0 reference_worker 3u32
+  v4:u64 = rt_spawn_u32 v0 reference_worker 4u32
+  v5:u64 = rt_spawn_u32 v0 reference_worker 5u32
+  v6:u64 = rt_spawn_u32 v0 reference_worker 6u32
+  v7:u64 = rt_spawn_u32 v0 reference_worker 7u32
+  v8:u64 = rt_spawn_u32 v0 reference_worker 8u32
+  v9:u32 = rt_join_u32 v1
+  v10:u32 = rt_join_u32 v2
+  v11:u32 = rt_join_u32 v3
+  v12:u32 = rt_join_u32 v4
+  v13:u32 = rt_join_u32 v5
+  v14:u32 = rt_join_u32 v6
+  v15:u32 = rt_join_u32 v7
+  v16:u32 = rt_join_u32 v8
+  v17:u32 = add v9 v10
+  v18:u32 = add v11 v12
+  v19:u32 = add v13 v14
+  v20:u32 = add v15 v16
+  v21:u32 = add v17 v18
+  v22:u32 = add v19 v20
+  v23:u32 = add v21 v22
+  v24:b1 = rt_task_close v1
+  v25:b1 = rt_task_close v2
+  v26:b1 = rt_task_close v3
+  v27:b1 = rt_task_close v4
+  v28:b1 = rt_task_close v5
+  v29:b1 = rt_task_close v6
+  v30:b1 = rt_task_close v7
+  v31:b1 = rt_task_close v8
+  v32:b1 = rt_shutdown v0 20u32
+  v33:b1 = rt_close v0
+  return v23
+
+test t0
+  out 1636u32
+
+end

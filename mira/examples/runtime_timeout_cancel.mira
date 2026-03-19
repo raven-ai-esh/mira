@@ -1,0 +1,51 @@
+module runtime.timeout.cancel@1
+target native
+
+func slow_job
+arg steps:u32
+ret u32
+eff spawn clock
+cap clock("monotonic")
+spec kind=runtime constraints=[timer,cancel]
+block b0
+  jump b1(0u32, steps)
+
+block b1(i:u32, n:u32)
+  v0:b1 = rt_cancelled
+  branch v0 b2(i, n) b3(i, n)
+
+block b2(i:u32, n:u32)
+  return 999u32
+
+block b3(i:u32, n:u32)
+  v1:b1 = lt i n
+  branch v1 b4(i, n) b5(i, n)
+
+block b4(i:u32, n:u32)
+  v2:b1 = task_sleep_ms 2u32
+  v3:u32 = add i 1u32
+  jump b1(v3, n)
+
+block b5(i:u32, n:u32)
+  return i
+end
+
+func cancel_slow_job
+ret u32
+eff spawn clock
+cap clock("monotonic")
+spec kind=runtime constraints=[timeout,cancel,graceful_shutdown]
+block b0
+  v0:u64 = rt_open 1u32
+  v1:u64 = rt_spawn_u32 v0 slow_job 20u32
+  v2:b1 = task_sleep_ms 5u32
+  v3:b1 = rt_cancel v1
+  v4:u32 = rt_join_u32 v1
+  v5:b1 = rt_task_close v1
+  v6:b1 = rt_shutdown v0 50u32
+  v7:b1 = rt_close v0
+  return v4
+
+test t0
+  out 999u32
+end

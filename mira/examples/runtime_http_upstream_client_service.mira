@@ -1,0 +1,50 @@
+module runtime.http.upstream.client.service@1
+target native
+
+func pool_open_close_ok
+ret u8
+eff net alloc
+cap net("127.0.0.1:39612")
+spec kind=http constraints=[client,pool]
+block b0
+  v0:u64 = http_client_pool_open 2u32
+  v1:b1 = http_client_pool_close v0
+  return 1u8
+test t0
+  out 1u8
+end
+
+func fetch_three_status_codes
+ret u32
+eff net alloc
+cap net("127.0.0.1:39612")
+spec kind=http constraints=[client,reuse,retry,backoff,pool]
+block b0
+  v0:u64 = http_client_open
+  v1:own[buf[u8]] = buf_lit GET\x20/health\x20HTTP/1.1\r\nHost:\x20localhost\r\nConnection:\x20close\r\n\r\n
+  v2:own[buf[u8]] = http_client_request v0 v1
+  v3:view[buf[u8]] = view v2
+  v4:u32 = http_status_u32 v3
+  v5:own[buf[u8]] = buf_lit GET\x20/ready\x20HTTP/1.1\r\nHost:\x20localhost\r\nConnection:\x20close\r\n\r\n
+  v6:own[buf[u8]] = http_client_request_retry v0 2u32 25u32 v5
+  v7:view[buf[u8]] = view v6
+  v8:u32 = http_status_u32 v7
+  v9:u64 = http_client_pool_open 2u32
+  v10:u64 = http_client_pool_acquire v9
+  v11:own[buf[u8]] = buf_lit GET\x20/pooled\x20HTTP/1.1\r\nHost:\x20localhost\r\nConnection:\x20close\r\n\r\n
+  v12:own[buf[u8]] = http_client_request v10 v11
+  v13:view[buf[u8]] = view v12
+  v14:u32 = http_status_u32 v13
+  v15:u32 = add v4 v8
+  v16:u32 = add v15 v14
+  v17:b1 = http_client_pool_release v9 v10
+  v18:b1 = http_client_close v0
+  v19:b1 = http_client_pool_close v9
+  v20:b1 = drop v12
+  v21:b1 = drop v11
+  v22:b1 = drop v6
+  v23:b1 = drop v5
+  v24:b1 = drop v2
+  v25:b1 = drop v1
+  return v16
+end

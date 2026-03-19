@@ -1,0 +1,90 @@
+module runtime.json.api.endpoint@1
+target native
+
+func decode_request_and_encode_response
+ret u8
+eff net alloc
+cap net("127.0.0.1:18080")
+spec kind=http constraints=[json,decode,encode,stdlib]
+block b0
+  v0:own[buf[u8]] = buf_lit POST\x20/v1/items\x20HTTP/1.1\r\nHost:\x20localhost\r\nContent-Type:\x20application/json\r\n\r\n\x7b\x22name\x22:\x22egor\x22,\x22count\x22:7,\x22active\x22:true\x7d
+  v1:view[buf[u8]] = view v0
+  v2:own[buf[u8]] = http_request_method v1
+  v3:own[str] = buf_to_str v2
+  v4:b1 = drop v2
+  v6:b1 = str_eq_lit v3 POST
+  branch v6 b1(v0, v3, v1) b8(v0, v3)
+
+block b1(req:own[buf[u8]], method:own[str], req_view:view[buf[u8]])
+  v7:own[buf[u8]] = http_request_path req_view
+  v8:own[str] = buf_to_str v7
+  v9:b1 = drop v7
+  v11:b1 = str_eq_lit v8 /v1/items
+  branch v11 b2(req, method, v8, req_view) b9(req, method, v8)
+
+block b2(req:own[buf[u8]], method:own[str], path:own[str], req_view:view[buf[u8]])
+  v12:own[buf[u8]] = http_body req_view
+  v13:own[str] = buf_to_str v12
+  v14:b1 = drop v12
+  v15:b1 = drop req
+  v17:own[str] = json_get_str v13 name
+  v19:b1 = str_eq_lit v17 egor
+  branch v19 b3(method, path, v13, v17) b10(method, path, v13, v17)
+
+block b3(method:own[str], path:own[str], body:own[str], name:own[str])
+  v21:u32 = json_get_u32 body count
+  v22:b1 = eq v21 7u32
+  branch v22 b4(method, path, body, name, v21) b10(method, path, body, name)
+
+block b4(method:own[str], path:own[str], body:own[str], name:own[str], count:u32)
+  v24:b1 = json_get_bool body active
+  branch v24 b5(method, path, body, name, count, v24) b10(method, path, body, name)
+
+block b5(method:own[str], path:own[str], body:own[str], name:own[str], count:u32, active:b1)
+  v25:own[str] = str_lit accepted
+  v30:own[str] = json_encode_obj method method path path status v25 count count active active name name
+  v32:own[str] = json_get_str v30 status
+  v34:b1 = str_eq_lit v32 accepted
+  branch v34 b6(method, path, body, name, v25, v30, v32) b11(method, path, body, name, v25, v30, v32)
+
+block b6(method:own[str], path:own[str], body:own[str], name:own[str], status:own[str], response:own[str], response_status:own[str])
+  v35:b1 = drop response_status
+  v36:b1 = drop response
+  v37:b1 = drop status
+  v38:b1 = drop name
+  v39:b1 = drop body
+  v40:b1 = drop path
+  v41:b1 = drop method
+  return 1u8
+
+block b8(req:own[buf[u8]], method:own[str])
+  v42:b1 = drop method
+  v43:b1 = drop req
+  return 0u8
+
+block b9(req:own[buf[u8]], method:own[str], path:own[str])
+  v44:b1 = drop path
+  v45:b1 = drop method
+  v46:b1 = drop req
+  return 0u8
+
+block b10(method:own[str], path:own[str], body:own[str], name:own[str])
+  v47:b1 = drop name
+  v48:b1 = drop body
+  v49:b1 = drop path
+  v50:b1 = drop method
+  return 0u8
+
+block b11(method:own[str], path:own[str], body:own[str], name:own[str], status:own[str], response:own[str], response_status:own[str])
+  v51:b1 = drop response_status
+  v52:b1 = drop response
+  v53:b1 = drop status
+  v54:b1 = drop name
+  v55:b1 = drop body
+  v56:b1 = drop path
+  v57:b1 = drop method
+  return 0u8
+
+test t0
+  out 1u8
+end

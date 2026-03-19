@@ -1,0 +1,338 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MIRA/A v1 Program",
+  "type": "object",
+  "required": ["module", "uses", "types", "consts", "functions"],
+  "properties": {
+    "module": { "type": "string" },
+    "target": { "type": ["string", "null"] },
+    "uses": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "types": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/type_decl" }
+    },
+    "consts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/const_decl" }
+    },
+    "functions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/function" }
+    }
+  },
+  "$defs": {
+    "const_decl": {
+      "type": "object",
+      "required": ["name", "ty", "value"],
+      "properties": {
+        "name": { "type": "string" },
+        "ty": { "$ref": "#/$defs/type_ref" },
+        "value": { "type": "string" }
+      }
+    },
+    "type_ref": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind"],
+          "properties": {
+            "kind": { "const": "bool" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "int" },
+            "value": {
+              "type": "object",
+              "required": ["signed", "bits"],
+              "properties": {
+                "signed": { "type": "boolean" },
+                "bits": { "type": "integer" }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "float" },
+            "value": {
+              "type": "object",
+              "required": ["bits"],
+              "properties": {
+                "bits": { "type": "integer" }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "named" },
+            "value": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "span" },
+            "value": { "$ref": "#/$defs/type_ref" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "buf" },
+            "value": { "$ref": "#/$defs/type_ref" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "vec" },
+            "value": {
+              "type": "object",
+              "required": ["len", "elem"],
+              "properties": {
+                "len": { "type": "integer" },
+                "elem": { "$ref": "#/$defs/type_ref" }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "option" },
+            "value": { "$ref": "#/$defs/type_ref" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "result" },
+            "value": {
+              "type": "object",
+              "required": ["ok", "err"],
+              "properties": {
+                "ok": { "$ref": "#/$defs/type_ref" },
+                "err": { "$ref": "#/$defs/type_ref" }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "own" },
+            "value": { "$ref": "#/$defs/type_ref" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "view" },
+            "value": { "$ref": "#/$defs/type_ref" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "edit" },
+            "value": { "$ref": "#/$defs/type_ref" }
+          }
+        }
+      ]
+    },
+    "type_decl": {
+      "type": "object",
+      "required": ["name", "body"],
+      "properties": {
+        "name": { "type": "string" },
+        "body": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": ["kind", "value"],
+              "properties": {
+                "kind": { "const": "struct" },
+                "value": {
+                  "type": "object",
+                  "required": ["fields"],
+                  "properties": {
+                    "fields": { "type": "array", "items": { "$ref": "#/$defs/field" } }
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": ["kind", "value"],
+              "properties": {
+                "kind": { "const": "enum" },
+                "value": {
+                  "type": "object",
+                  "required": ["variants"],
+                  "properties": {
+                    "variants": { "type": "array", "items": { "$ref": "#/$defs/enum_variant" } }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "enum_variant": {
+      "type": "object",
+      "required": ["name", "fields"],
+      "properties": {
+        "name": { "type": "string" },
+        "fields": { "type": "array", "items": { "$ref": "#/$defs/field" } }
+      }
+    },
+    "field": {
+      "type": "object",
+      "required": ["name", "ty"],
+      "properties": {
+        "name": { "type": "string" },
+        "ty": { "$ref": "#/$defs/type_ref" }
+      }
+    },
+    "instruction": {
+      "type": "object",
+      "required": ["bind", "ty", "op", "args"],
+      "properties": {
+        "bind": { "type": "string" },
+        "ty": { "$ref": "#/$defs/type_ref" },
+        "op": { "type": "string" },
+        "args": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "required": ["label", "args"],
+      "properties": {
+        "label": { "type": "string" },
+        "args": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "terminator": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "return" },
+            "value": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "jump" },
+            "value": { "$ref": "#/$defs/target" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "branch" },
+            "value": {
+              "type": "object",
+              "required": ["condition", "truthy", "falsy"],
+              "properties": {
+                "condition": { "type": "string" },
+                "truthy": { "$ref": "#/$defs/target" },
+                "falsy": { "$ref": "#/$defs/target" }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "match" },
+            "value": {
+              "type": "object",
+              "required": ["value", "arms"],
+              "properties": {
+                "value": { "type": "string" },
+                "arms": {
+                  "type": "array",
+                  "items": { "$ref": "#/$defs/target" }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "block": {
+      "type": "object",
+      "required": ["label", "params", "instructions", "terminator"],
+      "properties": {
+        "label": { "type": "string" },
+        "params": { "type": "array", "items": { "$ref": "#/$defs/field" } },
+        "instructions": { "type": "array", "items": { "$ref": "#/$defs/instruction" } },
+        "terminator": { "$ref": "#/$defs/terminator" }
+      }
+    },
+    "test_case": {
+      "type": "object",
+      "required": ["name", "call", "inputs", "expected"],
+      "properties": {
+        "name": { "type": "string" },
+        "call": { "type": ["string", "null"] },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": [{ "type": "string" }, { "type": "string" }]
+          }
+        },
+        "expected": { "type": "string" }
+      }
+    },
+    "function": {
+      "type": "object",
+      "required": ["name", "args", "ret", "effects", "capabilities", "specs", "blocks", "tests"],
+      "properties": {
+        "name": { "type": "string" },
+        "args": { "type": "array", "items": { "$ref": "#/$defs/field" } },
+        "ret": { "$ref": "#/$defs/type_ref" },
+        "effects": { "type": "array", "items": { "type": "string" } },
+        "capabilities": { "type": "array", "items": { "type": "string" } },
+        "specs": { "type": "array", "items": { "type": "string" } },
+        "blocks": { "type": "array", "items": { "$ref": "#/$defs/block" } },
+        "tests": { "type": "array", "items": { "$ref": "#/$defs/test_case" } }
+      }
+    }
+  }
+}

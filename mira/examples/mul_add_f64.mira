@@ -1,0 +1,18 @@
+module fp.math@1
+target native
+
+func mul_add_f64
+arg x:f64
+arg y:f64
+ret f64
+eff pure
+spec kind=scalar domain=[x,y] op=mul_add constraints=[pure,no_alloc]
+block b0
+  v0:f64 = mul x y
+  v1:f64 = add v0 1.5f64
+  return v1
+test t0
+  in x=2.0f64
+  in y=3.0f64
+  out 7.5f64
+end

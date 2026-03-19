@@ -1,0 +1,24 @@
+module runtime.ffi.lib@1
+target native
+
+func foreign_atoi_via_lib
+ret i32
+eff ffi alloc
+cap ffi("atoi,lib:/usr/lib/libSystem.B.dylib")
+spec kind=ffi constraints=[ffi,lib,cstr,bytes]
+block b0
+  v0:u64 = ffi_open_lib /usr/lib/libSystem.B.dylib
+  v1:own[buf[u8]] = alloc heap 3u32
+  v2:edit[buf[u8]] = edit v1
+  v3:edit[buf[u8]] = store v2 0u32 52u8
+  v4:edit[buf[u8]] = store v3 1u32 50u8
+  v5:edit[buf[u8]] = store v4 2u32 0u8
+  v6:view[buf[u8]] = view v5
+  v7:i32 = ffi_call_lib_cstr v0 atoi v6
+  v8:b1 = ffi_close_lib v0
+  v9:b1 = drop v1
+  return v7
+
+test t0
+  out 42i32
+end
