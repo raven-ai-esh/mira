@@ -1,22 +1,24 @@
 # MIRA Public Publishing Guide
 
 Date: `2026-03-19`
-Status: `launch bundle preparation`
+Status: `public repo published; next step is external announcement cadence`
 
-This guide explains how to move the current local `MIRA` launch assets into a
-real public release.
+This guide explains how to move the prepared `MIRA` launch assets into an
+ongoing public release process.
 
-## Current Constraint
+## Current State
 
 The current workspace:
 
 - is not itself a git repository
-- has no attached public remote
-- stores launch assets locally under `docs/` and `tmp/mira-release/`
+- stores source launch assets locally under `docs/` and `tmp/mira-release/`
 
-So the right next step is not “write more local markdown”.
-The right next step is “export a clean public repo and publish the launch
-bundle”.
+The dedicated public repo is now live at:
+
+- [raven-ai-esh/mira](https://github.com/raven-ai-esh/mira)
+
+So the next step is no longer “publish the repo”.
+The next step is “run the external announcement and early-adopter loop”.
 
 ## Recommended Public Repo Structure
 
@@ -52,11 +54,11 @@ artifacts/
 ## Recommended Export Order
 
 1. Start from:
-   [MIRA_PUBLIC_REPO_README.md](docs/MIRA_PUBLIC_REPO_README.md)
+   [MIRA_PUBLIC_REPO_README.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_REPO_README.md)
 2. Copy the docs linked in:
-   [MIRA_PUBLIC_DOCS_INDEX.md](docs/MIRA_PUBLIC_DOCS_INDEX.md)
+   [MIRA_PUBLIC_DOCS_INDEX.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_DOCS_INDEX.md)
 3. Copy the public proof artifacts referenced by:
-   [MIRA_PUBLIC_BENCHMARK_EVIDENCE.md](docs/MIRA_PUBLIC_BENCHMARK_EVIDENCE.md)
+   [MIRA_PUBLIC_BENCHMARK_EVIDENCE.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_BENCHMARK_EVIDENCE.md)
 4. Copy starter examples from `mira/examples/` that appear in the public docs.
 5. Include the benchmark/proof JSON artifacts from `tmp/mira-release/`.
 
@@ -78,13 +80,13 @@ artifacts/
 - workspace-specific automation
 - unrelated personal-activity directories
 
-## Verification Before Publishing
+## Verification Before Updating The Public Repo
 
 Run these locally before copying or publishing:
 
 ```bash
-python3 mirac/tools/public_benchmark_visibility_refresh.py
-python3 mirac/tools/public_launch_bundle_check.py
+python3 /Users/sheremetovegor/Documents/Raven/personal-activity/mirac/tools/public_benchmark_visibility_refresh.py
+python3 /Users/sheremetovegor/Documents/Raven/personal-activity/mirac/tools/public_launch_bundle_check.py
 ```
 
 ## Public Rule

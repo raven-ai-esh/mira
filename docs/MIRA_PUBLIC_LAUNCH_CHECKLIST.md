@@ -2,37 +2,41 @@
 
 Date: `2026-03-19`
 Baseline: `MIRA 2.6.0`
-Status: `prepared locally, not yet externally published`
+Status: `public repo published, announcement wave pending`
 
 This checklist is the exact execution path from local launch assets to public
 release.
 
+Public repo:
+
+- [raven-ai-esh/mira](https://github.com/raven-ai-esh/mira)
+
 ## Phase 1. Public Repo Creation
 
-- [ ] Create or choose the dedicated public `MIRA` repository.
-- [ ] Copy the launch-facing docs into that repo.
-- [ ] Add the public-facing README from
-      [MIRA_PUBLIC_REPO_README.md](docs/MIRA_PUBLIC_REPO_README.md)
+- [x] Create or choose the dedicated public `MIRA` repository.
+- [x] Copy the launch-facing docs into that repo.
+- [x] Add the public-facing README from
+      [MIRA_PUBLIC_REPO_README.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_REPO_README.md)
       as the repo root `README.md`.
 - [ ] Ensure license, contribution policy, and issue/discussion settings are
       present.
-- [ ] Publish the canonical docs index from
-      [MIRA_PUBLIC_DOCS_INDEX.md](docs/MIRA_PUBLIC_DOCS_INDEX.md).
+- [x] Publish the canonical docs index from
+      [MIRA_PUBLIC_DOCS_INDEX.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_DOCS_INDEX.md).
 
 ## Phase 2. Proof Visibility
 
-- [ ] Publish benchmark evidence index:
-      [MIRA_PUBLIC_BENCHMARK_EVIDENCE.md](docs/MIRA_PUBLIC_BENCHMARK_EVIDENCE.md)
-- [ ] Publish benchmark matrix and diagnostics pages.
-- [ ] Publish `Go` and `Rust` comparison pages.
-- [ ] Publish messaging, analytics, and distributed proof packs.
-- [ ] Publish or attach raw evidence artifacts from `tmp/mira-release`.
+- [x] Publish benchmark evidence index:
+      [MIRA_PUBLIC_BENCHMARK_EVIDENCE.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_BENCHMARK_EVIDENCE.md)
+- [x] Publish benchmark matrix and diagnostics pages.
+- [x] Publish `Go` and `Rust` comparison pages.
+- [x] Publish messaging, analytics, and distributed proof packs.
+- [x] Publish or attach raw evidence artifacts from `tmp/mira-release`.
 
 ## Phase 3. First-Use Conversion
 
-- [ ] Publish quickstart and first-run demo.
-- [ ] Publish API, messaging, and analytics starter packs.
-- [ ] Publish prompt kit and onboarding commands.
+- [x] Publish quickstart and first-run demo.
+- [x] Publish API, messaging, and analytics starter packs.
+- [x] Publish prompt kit and onboarding commands.
 - [ ] Verify that a new visitor can follow one working path without private
       context.
 
@@ -61,11 +65,12 @@ release.
 
 ## Exit Condition
 
-Launch is considered actually public only when:
+Launch is considered externally announced only when:
 
 - the repo is reachable externally
 - the docs index is published
 - the proof pages are reachable
 - at least one first-wave public post has gone out
 
-Until then, this remains a prepared launch bundle, not a completed launch.
+Until then, this is a live public repo and docs surface, but not yet a fully
+announced launch.

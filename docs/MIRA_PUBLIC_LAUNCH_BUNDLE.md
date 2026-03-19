@@ -1,14 +1,14 @@
 # MIRA Public Launch Bundle
 
 Date: `2026-03-19`
-Status: `ready for external publication packaging`
+Status: `public repo published, announcement wave pending`
 
 This document summarizes the first real public launch bundle for `MIRA`.
 
 ## What This Bundle Is
 
-This is the package you can export into a dedicated public `MIRA` repository or
-docs site right now.
+This is the package now published in the dedicated public `MIRA` repository and
+ready for broader external announcement.
 
 It includes:
 
@@ -23,55 +23,56 @@ It includes:
 ## Main Entry Points
 
 - repo README:
-  [MIRA_PUBLIC_REPO_README.md](docs/MIRA_PUBLIC_REPO_README.md)
+  [MIRA_PUBLIC_REPO_README.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_REPO_README.md)
 - docs index:
-  [MIRA_PUBLIC_DOCS_INDEX.md](docs/MIRA_PUBLIC_DOCS_INDEX.md)
+  [MIRA_PUBLIC_DOCS_INDEX.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_DOCS_INDEX.md)
 - benchmark evidence index:
-  [MIRA_PUBLIC_BENCHMARK_EVIDENCE.md](docs/MIRA_PUBLIC_BENCHMARK_EVIDENCE.md)
+  [MIRA_PUBLIC_BENCHMARK_EVIDENCE.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_BENCHMARK_EVIDENCE.md)
 - publishing guide:
-  [MIRA_PUBLIC_PUBLISHING_GUIDE.md](docs/MIRA_PUBLIC_PUBLISHING_GUIDE.md)
+  [MIRA_PUBLIC_PUBLISHING_GUIDE.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_PUBLISHING_GUIDE.md)
 - launch checklist:
-  [MIRA_PUBLIC_LAUNCH_CHECKLIST.md](docs/MIRA_PUBLIC_LAUNCH_CHECKLIST.md)
+  [MIRA_PUBLIC_LAUNCH_CHECKLIST.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_LAUNCH_CHECKLIST.md)
 - launch posts:
-  [MIRA_PUBLIC_LAUNCH_POSTS.md](docs/MIRA_PUBLIC_LAUNCH_POSTS.md)
+  [MIRA_PUBLIC_LAUNCH_POSTS.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_LAUNCH_POSTS.md)
 
 ## Source Of Truth
 
 This bundle is anchored in:
 
 - `MIRA 2.6.0` public technical baseline:
-  [MIRA_RELEASE_2.6.0.md](docs/MIRA_RELEASE_2.6.0.md)
+  [MIRA_RELEASE_2.6.0.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_RELEASE_2.6.0.md)
 - `3.0.0` positioning foundation:
-  [MIRA_RELEASE_3.0.0.md](docs/MIRA_RELEASE_3.0.0.md)
+  [MIRA_RELEASE_3.0.0.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_RELEASE_3.0.0.md)
 - `3.1.0` onboarding foundation:
-  [MIRA_RELEASE_3.1.0.md](docs/MIRA_RELEASE_3.1.0.md)
+  [MIRA_RELEASE_3.1.0.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_RELEASE_3.1.0.md)
 - `3.2.0` proof visibility foundation:
-  [MIRA_RELEASE_3.2.0.md](docs/MIRA_RELEASE_3.2.0.md)
+  [MIRA_RELEASE_3.2.0.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_RELEASE_3.2.0.md)
 
 ## Verification
 
 Validate the bundle locally with:
 
 ```bash
-python3 mirac/tools/public_benchmark_visibility_refresh.py
-python3 mirac/tools/public_launch_bundle_check.py
+python3 /Users/sheremetovegor/Documents/Raven/personal-activity/mirac/tools/public_benchmark_visibility_refresh.py
+python3 /Users/sheremetovegor/Documents/Raven/personal-activity/mirac/tools/public_launch_bundle_check.py
 ```
 
 Manifest:
 
-- [manifest-public-launch-v1.json](artifacts/manifest-public-launch-v1.json)
+- [manifest-public-launch-v1.json](/Users/sheremetovegor/Documents/Raven/personal-activity/tmp/mira-release/manifest-public-launch-v1.json)
 
-## Important Constraint
+## Current Constraint
 
-This bundle is prepared locally.
+The public repo is now live at:
 
-It does not mean external publication has already happened.
+- [raven-ai-esh/mira](https://github.com/raven-ai-esh/mira)
 
-Actual public launch starts only after:
+What is still pending is the broader announcement wave and post-launch
+community loop:
 
-- public repo creation
-- external docs publication
 - first-wave public posts
+- explicit contributor/discussion loop activation
+- external feedback capture
 
 Those exact external actions are tracked in
-[MIRA_PUBLIC_LAUNCH_CHECKLIST.md](docs/MIRA_PUBLIC_LAUNCH_CHECKLIST.md).
+[MIRA_PUBLIC_LAUNCH_CHECKLIST.md](/Users/sheremetovegor/Documents/Raven/personal-activity/docs/MIRA_PUBLIC_LAUNCH_CHECKLIST.md).
